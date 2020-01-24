@@ -81,7 +81,9 @@ wss.on('connection', ws => {
   ws.on('close', () => { if (ws.username) delete users[ws.username] })
 })
 
-let stund = cp.spawn('/usr/sbin/stund',['-v','-h',sugggestLocalNetIp()])
+let localIp = sugggestLocalNetIp()
+d('Starting stund on: ' + localIp)
+let stund = cp.spawn('/usr/sbin/stund',['-v','-h',localIp])
     stund.stdout.on('data',  data => console.log   )
     stund.stderr.on('data',  data => console.error )
     stund       .on('close', code => console.log   )
