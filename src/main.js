@@ -3,12 +3,7 @@ import Main from './layouts/Main.vue'
 import Home from './pages/Home.vue'
 import About from './pages/About.vue'
 import NotFound from './pages/404.vue'
-import AppSecurityClient from './pages/AppSecurityClient.vue'
-import AppSecurityStreamer from './pages/AppSecurityStreamer.vue'
-import AppBabyPhoneClient from './pages/AppBabyPhoneClient.vue'
-import AppBabyPhoneStreamer from './pages/AppBabyPhoneStreamer.vue'
-import AppPhoneCall from './pages/AppPhoneCall.vue'
-import AppVideoCall from './pages/AppVideoCall.vue'
+import AppMedia from './pages/AppMedia.vue'
 import VueMaterial from "vue-material"
 import VueRouter from "vue-router"
 import VueFullscreen from 'vue-fullscreen'
@@ -23,15 +18,15 @@ const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    { path: '/rtc/', component: Home },
-    { path: '/rtc/about', component: About },
-    { path: '/rtc/cam/security/client', component: AppSecurityClient },
-    { path: '/rtc/cam/security/streamer', component: AppSecurityStreamer },
-    { path: '/rtc/cam/babyphone/client', component: AppBabyPhoneClient },
-    { path: '/rtc/cam/babyphone/streamer', component: AppBabyPhoneStreamer },
-    { path: '/rtc/cam/phone/call', component: AppPhoneCall },
-    { path: '/rtc/cam/video/call', component: AppVideoCall },
-    { path: '/rtc/*', component: NotFound }
+    { path: '/rtc/',                      component: Home},
+    { path: '/rtc/about',                 component: About },
+    { path: '/rtc/cam/security/client',   component: AppMedia, props: { audio:'recvonly', video: 'recvonly'}},
+    { path: '/rtc/cam/security/streamer', component: AppMedia, props: { audio:'sendonly', video: 'sendonly'}},
+    { path: '/rtc/cam/babyphone/client',  component: AppMedia, props: { audio:'recvonly', video: 'recvonly'}},
+    { path: '/rtc/cam/babyphone/streamer',component: AppMedia, props: { audio:'sendonly', video: 'sendonly'}},
+    { path: '/rtc/cam/phone/call',        component: AppMedia, props: { audio:'sendrecv', video: 'inactive'}},
+    { path: '/rtc/cam/video/call',        component: AppMedia, props: { audio:'sendrecv', video: 'sendrecv'}},
+    { path: '/rtc/*',                     component: NotFound }
   ]
 })
 
