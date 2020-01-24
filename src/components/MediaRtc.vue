@@ -68,7 +68,7 @@
         <div style="clear:both"></div>
         <md-button
           id="login"
-          class="md-layout-item md-xlarge-size-20">Reister</md-button>
+          class="md-layout-item md-xlarge-size-20">Register</md-button>
         <md-button 
           v-show="video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly'"
           id="call-make"
