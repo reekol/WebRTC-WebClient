@@ -3,8 +3,8 @@
     <particles-bg type="cobweb" :canvas="{backgroundColor:'#888'}" :bg="true" />
     <div class="topMenu">
         <ul>
-            <router-link tag="li" to="/">Home</router-link>
-            <router-link tag="li" to="/about">About</router-link>
+            <router-link tag="li" to="/rtc">Home</router-link>
+            <router-link tag="li" to="/rtc/about">About</router-link>
         </ul>
     </div>
     <div class="centered-container">

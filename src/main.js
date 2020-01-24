@@ -23,15 +23,15 @@ const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    { path: '/', component: Home },
-    { path: '/about', component: About },
-    { path: '/cam/security/client', component: AppSecurityClient },
-    { path: '/cam/security/streamer', component: AppSecurityStreamer },
-    { path: '/cam/babyphone/client', component: AppBabyPhoneClient },
-    { path: '/cam/babyphone/streamer', component: AppBabyPhoneStreamer },
-    { path: '/cam/phone/call', component: AppPhoneCall },
-    { path: '/cam/video/call', component: AppVideoCall },
-    { path: '/*', component: NotFound }
+    { path: '/rtc/', component: Home },
+    { path: '/rtc/about', component: About },
+    { path: '/rtc/cam/security/client', component: AppSecurityClient },
+    { path: '/rtc/cam/security/streamer', component: AppSecurityStreamer },
+    { path: '/rtc/cam/babyphone/client', component: AppBabyPhoneClient },
+    { path: '/rtc/cam/babyphone/streamer', component: AppBabyPhoneStreamer },
+    { path: '/rtc/cam/phone/call', component: AppPhoneCall },
+    { path: '/rtc/cam/video/call', component: AppVideoCall },
+    { path: '/rtc/*', component: NotFound }
   ]
 })
 

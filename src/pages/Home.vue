@@ -1,49 +1,49 @@
 <template>
     <div style="padding-top:50px">
         <card-offer 
-          linkhead="/cam/securitye/streamer"
+          linkhead="/rtc/cam/security/streamer"
           image="/assets/security.png"
           title="Security camera"
           subhead="Free for non commersial use."
           content1="One way audio"
           content2="One way video"
           content3="..."
-          linkstreamer="/cam/security/streamer"
-          linkclient="/cam/security/client"
+          linkstreamer="/rtc/cam/security/streamer"
+          linkclient="/rtc/cam/security/client"
         />
 
         <card-offer 
-          linkhead="/cam/babyphone/streamer"
+          linkhead="/rtc/cam/babyphone/streamer"
           image="/assets/baby.png"
           title="Baby monitor"
           subhead="Free for non commersial use."
           content1="One way audio"
           content2="One way video"
           content3="..."
-          linkstreamer="/cam/babyphone/streamer"
-          linkclient="/cam/babyphone/client"
+          linkstreamer="/rtc/cam/babyphone/streamer"
+          linkclient="/rtc/cam/babyphone/client"
         />
         
         <card-offer 
-          linkhead="/cam/phone/call"
+          linkhead="/rtc/cam/phone/call"
           image="/assets/phonecall.png"
           title="Free audio call"
           subhead="Free for non commersial use."
           content1="Two way audio"
           content2="..."
           content3="..."
-          linkcall="/cam/phone/call"
+          linkcall="/rtc/cam/phone/call"
         />
         
         <card-offer 
-          linkhead="/cam/video/call"
+          linkhead="/rtc/cam/video/call"
           image="/assets/videocall.png"
           title="Free video call"
           subhead="Free for non commersial use."
           content1="Two way audio"
           content2="Two way video"
           content3="..."
-          linkcall="/cam/video/call"
+          linkcall="/rtc/cam/video/call"
         />
 
     </div>

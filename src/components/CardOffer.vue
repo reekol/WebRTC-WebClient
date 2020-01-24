@@ -1,7 +1,7 @@
 <template>
     <md-card class="md-elevation-24 md-primary" md-theme="ree-card">
       <md-card-media>
-        <router-link v-if="linkhead" :to="`${this.$root.$data.path}${linkhead}`">
+        <router-link v-if="linkhead" :to="`${linkhead}`">
            <img v-if="image" :src="`${this.$root.$data.path}${image}`" :alt="`${title}`" style="width:70%" />
         </router-link>
       </md-card-media>
