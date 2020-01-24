@@ -1,5 +1,7 @@
 <template>
-    <div id="pageAbout">
+  <div>
+  <center>
+    <div id="pageAbout" class="md-layout-item md-xlarge-size-30 md-large-size-50 md-medium-size-60 md-small-size-90 md-xsmall-size-90">
       <p>
         This web page is an Web interface to  <a href="https://github.com/reekol/WebRTC">Reekol's WebRTC</a> Git project.<br />
         Feel free to use it without any warranty for non commersial use.<br />
@@ -8,7 +10,7 @@
         email: <a href="mailto:cupuyc+WebRTC@gmail.com" >cupuyc+WebRTC@gmail.com</a><br />
         <br />
       </p>
-      <div style="width:100%;text-align:left">
+      <div>
         Credits goes to:<br />
         Vue - javascript framewrk for building web apps.<br />
         Nodejs - for the ssl socket server.<br />
@@ -23,7 +25,9 @@
         Data channel on security camera (to send current streemer coordinates)<br />
         Map (For security camera coordinates)
       </div>
-     </div>
+    </div>
+    </center>
+  </div>
 </template>
 
 <script>
@@ -33,8 +37,11 @@
     }
   }
 </script>
-<style>
+<style lang="scss" scoped>
   #pageAbout{
-    color:white
+    margin-top:50px;
+    text-align:left;
+    color:white;
+    border-right:1px dotted white
   }
 </style>

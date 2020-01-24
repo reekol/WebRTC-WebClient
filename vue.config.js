@@ -1,1 +1,3 @@
-module.exports = { devServer: { https: true } } 
+module.exports = {
+  devServer: { https: true }
+} 

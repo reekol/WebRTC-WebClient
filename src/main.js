@@ -38,5 +38,8 @@ const router = new VueRouter({
 new Vue({
   router,
   render: h => h(Main),
-  data: () => ({ n: 0 })
+  data: () => ({
+    n: 0 ,
+    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://localhost:8083'
+  })
 }).$mount('#app')

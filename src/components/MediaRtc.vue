@@ -1,21 +1,22 @@
 <template>
   <div>
     <md-card 
+      style="margin-top:50px"
       id="controlls"
-      class="md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-100" >
+      class="center md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-100" >
       <md-card-media>
         <!-- Local Video -->
         <md-field
           v-show="video === 'sendrecv' || video === 'sendonly'"
           class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
-          <video  id="local"  autoplay poster="/assets/stream.png"></video>
+          <video  id="local"  autoplay :poster="`${this.$root.$data.path}/assets/stream.png`"></video>
         </md-field>
         <!-- Remote Video -->
         <md-field 
           v-show="video === 'sendrecv' || video === 'recvonly'"
           class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
           <fullscreen class="center" :fullscreen.sync="fullscreen" ref="fullscreen" @change="fullscreenChange">
-            <video  id="remote" autoplay poster="/assets/stream.png" @click="togglefullscreen"></video>
+            <video  id="remote" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
           </fullscreen>
         </md-field>
       </md-card-media>

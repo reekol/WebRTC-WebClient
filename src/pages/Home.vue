@@ -1,48 +1,58 @@
 <template>
-    <div>
-        <card-security/>
-        <card-baby-phone/>
-        <card-phone-call/>
-        <card-video-call/>
+    <div style="padding-top:50px">
+        <card-offer 
+          linkhead="/cam/securitye/streamer"
+          image="/assets/security.png"
+          title="Security camera"
+          subhead="Free for non commersial use."
+          content1="One way audio"
+          content2="One way video"
+          content3="..."
+          linkstreamer="/cam/security/streamer"
+          linkclient="/cam/security/client"
+        />
+
+        <card-offer 
+          linkhead="/cam/babyphone/streamer"
+          image="/assets/baby.png"
+          title="Baby monitor"
+          subhead="Free for non commersial use."
+          content1="One way audio"
+          content2="One way video"
+          content3="..."
+          linkstreamer="/cam/babyphone/streamer"
+          linkclient="/cam/babyphone/client"
+        />
+        
+        <card-offer 
+          linkhead="/cam/phone/call"
+          image="/assets/phonecall.png"
+          title="Free audio call"
+          subhead="Free for non commersial use."
+          content1="Two way audio"
+          content2="..."
+          content3="..."
+          linkcall="/cam/phone/call"
+        />
+        
+        <card-offer 
+          linkhead="/cam/video/call"
+          image="/assets/videocall.png"
+          title="Free video call"
+          subhead="Free for non commersial use."
+          content1="Two way audio"
+          content2="Two way video"
+          content3="..."
+          linkcall="/cam/video/call"
+        />
+
     </div>
 </template>
 
 <script>
-import CardSecurity from '../components/CardSecurity.vue'
-import CardBabyPhone from '../components/CardBabyPhone.vue'
-import CardPhoneCall from '../components/CardPhoneCall.vue'
-import CardVideoCall from '../components/CardVideoCall.vue'
-
+import CardOffer from '../components/CardOffer.vue'
 export default {
-    components:{
-        CardSecurity,
-        CardBabyPhone,
-        CardPhoneCall,
-        CardVideoCall
-    },
-    mounted:()=>{
-      window.init = null
-    }
-  }
+    components:{ CardOffer },
+    mounted:()=>{ window.init = null }
+}
 </script>
-
-<style >
-  .md-card {
-    width: 260px;
-    margin: 20px;
-    margin-top:0;
-    display: inline-block;
-    vertical-align: top;
-  }
-  .md-card-content ul{
-    list-style-type: none;
-    float:left;
-    margin: 0;
-  }
-  .md-card-content li{
-    padding:2px;
-    color: #333333;
-    text-align: left;
-    text-decoration: none;
-  }
-</style>
