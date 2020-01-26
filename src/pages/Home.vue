@@ -45,6 +45,41 @@
           content3="..."
           linkcall="/rtc/cam/video/call"
         />
+        
+        <card-offer 
+          linkhead="/rtc/cam/data/call"
+          image="/assets/chat.png"
+          title="Free chat messages."
+          subhead="Free for non commersial use."
+          content1="Two way data channel."
+          content2="..."
+          content3="..."
+          linkcall="/rtc/cam/data/call"
+        />
+        
+<!--        <card-offer 
+          linkhead="/rtc/cam/data/call"
+          image="/assets/track.png"
+          title="Track device."
+          subhead="Free for non commersial use."
+          content1="One way data channel."
+          content2="..."
+          content3="..."
+          linkstreamer="/rtc/cam/data/streamer"
+          linkclient="/rtc/cam/data/client" 
+        />-->
+<!--        
+        <card-offer 
+          linkhead="/rtc/cam/file/call"
+          image="/assets/file.png"
+          title="File sharing."
+          subhead="Free for non commersial use."
+          content1="Two way data channel."
+          content2="..."
+          content3="..."
+          linkstreamer="/rtc/cam/file/streamer"
+          linkclient="/rtc/cam/file/client" 
+        />-->
 
     </div>
 </template>

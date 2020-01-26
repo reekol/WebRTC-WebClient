@@ -3,7 +3,7 @@ import Main from './layouts/Main.vue'
 import Home from './pages/Home.vue'
 import About from './pages/About.vue'
 import NotFound from './pages/404.vue'
-import AppMedia from './pages/AppMedia.vue'
+import MediaRtc from './components/MediaRtc.vue'
 import VueMaterial from "vue-material"
 import VueRouter from "vue-router"
 import VueFullscreen from 'vue-fullscreen'
@@ -20,12 +20,16 @@ const router = new VueRouter({
   routes: [
     { path: '/rtc/',                      component: Home},
     { path: '/rtc/about',                 component: About },
-    { path: '/rtc/cam/security/client',   component: AppMedia, props: { audio:'recvonly', video: 'recvonly'}},
-    { path: '/rtc/cam/security/streamer', component: AppMedia, props: { audio:'sendonly', video: 'sendonly'}},
-    { path: '/rtc/cam/babyphone/client',  component: AppMedia, props: { audio:'recvonly', video: 'recvonly'}},
-    { path: '/rtc/cam/babyphone/streamer',component: AppMedia, props: { audio:'sendonly', video: 'sendonly'}},
-    { path: '/rtc/cam/phone/call',        component: AppMedia, props: { audio:'sendrecv', video: 'inactive'}},
-    { path: '/rtc/cam/video/call',        component: AppMedia, props: { audio:'sendrecv', video: 'sendrecv'}},
+    { path: '/rtc/cam/security/client',   component: MediaRtc, props: { audio:'recvonly', video: 'recvonly', data:'inactive', file:'inactive'}},
+    { path: '/rtc/cam/security/streamer', component: MediaRtc, props: { audio:'sendonly', video: 'sendonly', data:'inactive', file:'inactive'}},
+    { path: '/rtc/cam/babyphone/client',  component: MediaRtc, props: { audio:'recvonly', video: 'recvonly', data:'inactive', file:'inactive'}},
+    { path: '/rtc/cam/babyphone/streamer',component: MediaRtc, props: { audio:'sendonly', video: 'sendonly', data:'inactive', file:'inactive'}},
+    { path: '/rtc/cam/phone/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'inactive', data:'inactive', file:'inactive'}},
+    { path: '/rtc/cam/video/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'sendrecv', data:'inactive', file:'inactive'}},
+    { path: '/rtc/cam/data/call',         component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'sendrecv', file:'inactive'}},
+    { path: '/rtc/cam/file/call',         component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'sendrecv'}},
+    { path: '/rtc/cam/file/streamer',     component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'sendonly'}},
+    { path: '/rtc/cam/file/client',       component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'recvonly'}},
     { path: '/rtc/*',                     component: NotFound }
   ]
 })
@@ -35,6 +39,6 @@ new Vue({
   render: h => h(Main),
   data: () => ({
     n: 0 ,
-    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://localhost:8083'
+    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://localhost:8080'
   })
 }).$mount('#app')
