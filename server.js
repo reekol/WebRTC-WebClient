@@ -1,3 +1,5 @@
+"use strict"
+
 const os        = require('os')
 const cp        = require('child_process')
 const fs        = require('fs')
@@ -14,6 +16,7 @@ const server    = https.createServer({cert:cert,key:key},app)
 const wss       = new WebSocket.Server({ server: server , path: '/socket'})
 const cwd       = process.cwd()
 const d         = console.log
+const PORT      = 3001
 
 const getLocalIpV4 = () => {
   let interfaces = os.networkInterfaces()
@@ -83,11 +86,11 @@ wss.on('connection', ws => {
 
 let localIp = sugggestLocalNetIp()
 d('Starting stund on: ' + localIp)
-let stund = cp.spawn('/usr/sbin/stund',['-v','-h',localIp])
-    stund.stdout.on('data',  data => console.log   )
-    stund.stderr.on('data',  data => console.error )
-    stund       .on('close', code => console.log   )
+ let stund = cp.spawn('/usr/sbin/stund',['-v','-h',localIp])
+     stund.stdout.on('data',  data => console.log   )
+     stund.stderr.on('data',  data => console.error )
+     stund       .on('close', code => console.log   )
 
-// app.get('/',                (req, res) => res.sendFile(`${cwd}/public/index.html` ) )
-server.listen(3001)
-
+d('Starting server on: https://' + localIp + ':' + PORT)
+app.get('/', (req, res) => { d('Reuested /'); res.send('working') } )
+server.listen(PORT)
