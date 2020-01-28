@@ -4,24 +4,26 @@
       style="margin-top:50px"
       id="controlls"
       class="center md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-100" >
+
       <md-card-media>
+
         <!-- Local Video -->
-        <md-field
+        <md-content 
           v-show="video === 'sendrecv' || video === 'sendonly'"
           class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
           <fullscreen class="center" :fullscreen.sync="fullscreen" ref="fullscreen" @change="fullscreenChange">
-            <video  id="local"  autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
+            <video  id="local" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
           </fullscreen>
-        </md-field>
-        
+        </md-content>
+
         <!-- Remote Video -->
-        <md-field 
+        <md-content
           v-show="video === 'sendrecv' || video === 'recvonly'"
           class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
           <fullscreen class="center" :fullscreen.sync="fullscreen" ref="fullscreen" @change="fullscreenChange">
             <video  id="remote" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
           </fullscreen>
-        </md-field>
+        </md-content>
       </md-card-media>
 
       <md-card-header>
@@ -29,7 +31,7 @@
         <md-field 
           v-show="video === 'sendrecv' || video === 'sendonly' || audio === 'sendrecv' || audio === 'sendonly' || data === 'sendrecv' || data  === 'sendonly' || file === 'sendrecv' || file  === 'sendonly'"
           class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
-          <md-input  id="username" readonly="readonly" placeholder="ID (auto generated)"/>
+          <md-input  id="username" readonly="readonly" placeholder="ID (auto generated)" :value="currentUser"/>
         </md-field>
         <!-- Username to call -->
         <md-field 
@@ -61,14 +63,14 @@
         <md-field 
           v-show="1"
           class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-input  id="state" readonly="readonly"  placeholder="Connection status" />
+          <md-input  id="state" readonly="readonly"  placeholder="Connection status" :value="connectionState"/>
         </md-field>
 
         <!-- Text message remote --->
         <md-field 
           v-show="data === 'sendrecv' || data === 'sendonly'"
           class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-textarea  id="message-output" placeholder="Messages will be displayed here." />
+          <md-textarea readonly="readonly" id="message-output" placeholder="Messages will be displayed here." />
         </md-field>
         
         <!-- Text message local --->
@@ -93,13 +95,14 @@
         <div style="clear:both"></div>
         <md-button
           id="login"
+          v-show="currentUser === '' "
           class="md-layout-item md-xlarge-size-20">Register</md-button>
         <md-button 
-          v-show="video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data === 'recvonly'"
+          v-show="currentUser !== '' && ( video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data === 'recvonly' )"
           id="call-make"
           class="md-layout-item md-xlarge-size-20">Dial</md-button>
         <md-button 
-          v-show="data === 'sendrecv' || data === 'sendonly'"
+          v-show="remoteUser !== '' && (data === 'sendrecv' || data === 'sendonly')"
           id="sendMsg"
           class="md-layout-item md-xlarge-size-20">Send</md-button>
 
@@ -130,6 +133,10 @@ export default {
     },
     props: ['audio','video','data','file'],
     data: () => ({
+        connectionState:'',
+        currentUser:'',
+        remoteUser:'',
+        connections:[],
         fullscreen:false,
         audioSelected: '',
         optionsAudio: [],
@@ -137,21 +144,23 @@ export default {
         optionsVideo: []
       }),
       mounted() {
+          
           let init = () => {
             let connection        = null
-            let dataChannel       = null
             let otherUsername     = null
             let messageIn         = document.querySelector('input#message-input')
             let messageOut        = document.querySelector('textarea#message-output')
             let local             = document.querySelector('video#local')
             let remote            = document.querySelector('video#remote')
             let remoteName        = document.querySelector('#username-to-call')
-            let state             = document.querySelector('#state')
             let btnLogin          = document.querySelector('button#login')
             let callBtn           = document.querySelector('button#call-make')
             let sendBtn           = document.querySelector('button#sendMsg')
             let hash              = window.location.hash.substr(1)
-            let ws                = new WebSocket('wss://seqr.link:3001/socket')
+            let ws                = null
+            let wsConnect         = ( )           => { ws = new WebSocket('wss://seqr.link:3001/socket') }
+                ws.onclose        = ( )           => { setTimeout(wsConnect, 1000) }
+                ws.onerror        = ( )           => { ws.close() }
             let connectionState   = (conn)        => { return (conn.connectionState || conn.iceConnectionState) }
             let checkState        = (conn)        => { return  ['new','connecting','failed','disconnected'].includes(connectionState(conn)) }
             let error             = error         => { d(error) }
@@ -169,18 +178,19 @@ export default {
             let _login            = data          => {
                 local.volume = 0
                 local.style.visibility = 'visible'
-                document.querySelector('#username').value = data.success
+                this.currentUser = data.success
                 createConnection()
             }
             let sendMsg           = ()            => { 
               if(messageIn.value){ 
-                dataChannel.send(messageIn.value)
+                connection.dataChannel.send(messageIn.value)
                 displayMsg('>' + messageIn.value)
                 messageIn.value = ''
               }
             }
             let createConnection  = async ()      => {
                     connection = new RTCPeerConnection({ iceServers: [{ urls: ['stun:seqr.link:3478'] }] })
+                this.connections.push(connection)
                 let audio     = ( this.audioSelected === 'none' ? false : { deviceId: { exact: this.audioSelected }} )
                 let video     = ( this.videoSelected === 'none' ? false : { deviceId: { exact: this.videoSelected}} )
                 let hasMedia  = ( audio || video )
@@ -191,11 +201,11 @@ export default {
                 }
 
                 if(this.data || ['sendrecv','sendonly'].includes(this.file) ){
-                  dataChannel           = connection.createDataChannel({ ordered: false, maxPacketLifeTime: 3000, })
-                  dataChannel.onerror   = error => { d("Data Channel Error:", error) }
-                  dataChannel.onmessage = event => { d("Got Data Channel Message:", event.data) }
-                  dataChannel.onopen    = ()    => { d("--- connected ---") }
-                  dataChannel.onclose   = ()    => { d("The Data Channel is Closed") }
+                  connection.dataChannel           = connection.createDataChannel({ ordered: false, maxPacketLifeTime: 3000, })
+                  connection.dataChannel.onerror   = error => { d("Data Channel Error:", error) }
+                  connection.dataChannel.onmessage = event => { d("Got Data Channel Message:", event.data) }
+                  connection.dataChannel.onopen    = ()    => { d("--- connected ---") }
+                  connection.dataChannel.onclose   = ()    => { d("The Data Channel is Closed") }
                   connection.ondatachannel = (event) =>{ event.channel.onmessage = (e) => { displayMsg('<' + e.data)}  }
                 }
 
@@ -204,10 +214,11 @@ export default {
                 connection.ontrack                      = event  => { remote.srcObject = event.stream }
                 connection.onaddstream                  = connection.ontrack
                 connection.onicecandidate               = event  => { if (event.candidate) sendMessage({ type: 'candidate', candidate: event.candidate }) }
-                connection.onconnectionstatechange      = () => { state.value = connectionState(connection) }
+                connection.onconnectionstatechange      = () => { this.connectionState = connectionState(connection) }
                 connection.oniceconnectionstatechange   = connection.onconnectionstatechange
-                state.value = connectionState(connection)
+                this.connectionState = connectionState(connection)
             }
+
             let handlers            =                   {_login:_login,_offer:_offer,_answer:_answer,_candidate:_candidate,_close:_close}
             ws.onopen               = ()             => { d('Connected to the signaling server') }
             ws.onmessage            = msg            => { let data = JSON.parse(msg.data); handlers[data.type](data) }
