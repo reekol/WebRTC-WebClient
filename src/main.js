@@ -39,6 +39,6 @@ new Vue({
   render: h => h(Main),
   data: () => ({
     n: 0 ,
-    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://localhost:8080'
+    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://localhost:8081'
   })
 }).$mount('#app')

@@ -29,13 +29,13 @@
       <md-card-header>
         <!-- Username -->
         <md-field 
-          v-show="video === 'sendrecv' || video === 'sendonly' || audio === 'sendrecv' || audio === 'sendonly' || data === 'sendrecv' || data  === 'sendonly' || file === 'sendrecv' || file  === 'sendonly'"
+          v-show="video === 'sendrecv' || video === 'sendonly' || audio === 'sendrecv' || audio === 'sendonly' || data === 'sendrecv' || data  === 'sendonly' || file === 'sendrecv' || file === 'sendonly'"
           class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
           <md-input  id="username" readonly="readonly" placeholder="ID (auto generated)" :value="currentUser"/>
         </md-field>
         <!-- Username to call -->
         <md-field 
-          v-show="video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data  === 'recvonly'"
+          v-show="connectionState !== '' && (video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data  === 'recvonly' || file === 'sendrecv' || file === 'recvonly')"
           class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
           <md-input  id="username-to-call" placeholder="ID to call" />
         </md-field>
@@ -93,12 +93,16 @@
       <md-card-actions>
         <!-- Register and Dial -->
         <div style="clear:both"></div>
+
+        <md-button
+          v-show="downloadReceived !== ''"
+          class="md-layout-item md-xlarge-size-20"><a href="#" id="downloadAnchor" >Download</a></md-button>
         <md-button
           id="login"
           v-show="currentUser === '' "
           class="md-layout-item md-xlarge-size-20">Register</md-button>
         <md-button 
-          v-show="currentUser !== '' && ( video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data === 'recvonly' )"
+          v-show="currentUser !== '' && ( video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data === 'recvonly' || file === 'sendrecv' || file === 'recvonly' )"
           id="call-make"
           class="md-layout-item md-xlarge-size-20">Dial</md-button>
         <md-button 
@@ -133,6 +137,7 @@ export default {
     },
     props: ['audio','video','data','file'],
     data: () => ({
+        downloadReceived:'',
         connectionState:'',
         currentUser:'',
         remoteUser:'',
@@ -149,6 +154,7 @@ export default {
             let connection        = null
             let otherUsername     = null
             let messageIn         = document.querySelector('input#message-input')
+            let fileLocal         = document.querySelector('input#file-local')
             let messageOut        = document.querySelector('textarea#message-output')
             let local             = document.querySelector('video#local')
             let remote            = document.querySelector('video#remote')
@@ -156,11 +162,16 @@ export default {
             let btnLogin          = document.querySelector('button#login')
             let callBtn           = document.querySelector('button#call-make')
             let sendBtn           = document.querySelector('button#sendMsg')
+            let downloadAnchor    = document.querySelector('#downloadAnchor')
             let hash              = window.location.hash.substr(1)
             let ws                = null
-            let wsConnect         = ( )           => { ws = new WebSocket('wss://seqr.link:3001/socket') }
-                ws.onclose        = ( )           => { setTimeout(wsConnect, 1000) }
-                ws.onerror        = ( )           => { ws.close() }
+            let wsConnect         = ( )           => { 
+                  ws = new WebSocket('wss://seqr.link:3001/socket')
+                  ws.onclose        = ( )           => { setTimeout(wsConnect, 1000) }
+                  ws.onerror        = ( )           => { ws.close() }
+                }
+                wsConnect()
+
             let connectionState   = (conn)        => { return (conn.connectionState || conn.iceConnectionState) }
             let checkState        = (conn)        => { return  ['new','connecting','failed','disconnected'].includes(connectionState(conn)) }
             let error             = error         => { d(error) }
@@ -200,13 +211,25 @@ export default {
                   connection.addStream(localStream)
                 }
 
-                if(this.data || ['sendrecv','sendonly'].includes(this.file) ){
+                if(this.data || ['sendrecv','sendonly','recvonly'].includes(this.file) ){
                   connection.dataChannel           = connection.createDataChannel({ ordered: false, maxPacketLifeTime: 3000, })
                   connection.dataChannel.onerror   = error => { d("Data Channel Error:", error) }
                   connection.dataChannel.onmessage = event => { d("Got Data Channel Message:", event.data) }
-                  connection.dataChannel.onopen    = ()    => { d("--- connected ---") }
                   connection.dataChannel.onclose   = ()    => { d("The Data Channel is Closed") }
-                  connection.ondatachannel = (event) =>{ event.channel.onmessage = (e) => { displayMsg('<' + e.data)}  }
+                  connection.dataChannel.onopen    = ()    => { d("--- connected ---") }
+                  connection.dataChannel.onopen    = ()    => { if(fileLocal.files.length) fileLocal.files[0].arrayBuffer().then(buff => { connection.dataChannel.send(buff) }) }
+
+                  connection.ondatachannel = (event) =>{ 
+                    event.channel.onmessage = (e) => {
+                      if(typeof e.data === 'object'){
+                        d('Receiving')
+                        downloadAnchor.href = URL.createObjectURL(new Blob([e.data]))
+                        downloadAnchor.download = 'seqr.bin'
+                        this.downloadReceived = 'Download'
+                      }
+                      else displayMsg('<' + e.data)
+                    }
+                  }
                 }
 
                 connection.addTransceiver('video',{currentDirection:this.video})

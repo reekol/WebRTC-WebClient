@@ -68,7 +68,7 @@
           linkstreamer="/rtc/cam/data/streamer"
           linkclient="/rtc/cam/data/client" 
         />-->
-<!--        
+        
         <card-offer 
           linkhead="/rtc/cam/file/call"
           image="/assets/file.png"
@@ -79,7 +79,7 @@
           content3="..."
           linkstreamer="/rtc/cam/file/streamer"
           linkclient="/rtc/cam/file/client" 
-        />-->
+        />
 
     </div>
 </template>
