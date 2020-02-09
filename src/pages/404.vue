@@ -1,7 +1,33 @@
 <template>
-    <div class="md-layout-item md-xlarge-size-100 md-large-size-100 md-big-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
-        <br />
-        <img src="/assets/404.png" alt="Not Found" /><br />
-        I wish i could see this, every time i look for plastic in the ocean.<br />
+    <div style="padding-top:50px">
+        <card-offer 
+          linkhead="/rtc/cam/security/streamer"
+          image="/assets/404.png"
+          title="Ooops!"
+          subhead="I wish i could see this when."
+          content1="i'am lookin for plastic in the ocean."
+          content2="Finding war zones in world map."
+          content3="Looking for a speeding ticket."
+          link1="/rtc"
+          link2="/rtc/register"
+          btn1="Home"
+          btn2="Registration"
+        />
     </div>
 </template>
+<style lang="scss" scoped>
+  .md-card {
+    width: 420px;
+    margin: 20px;
+    margin-top:auto;
+    display: inline-block;
+    vertical-align: center;
+  }
+</style>
+<script>
+import CardOffer from '../components/CardOffer.vue'
+export default {
+    components:{ CardOffer },
+    mounted:()=>{ window.init = null }
+}
+</script>

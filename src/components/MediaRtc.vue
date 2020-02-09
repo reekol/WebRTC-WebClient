@@ -6,116 +6,104 @@
       class="center md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-100" >
 
       <md-card-media>
-
         <!-- Local Video -->
         <md-content 
-          v-show="video === 'sendrecv' || video === 'sendonly'"
-          class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
+        v-show="options.audioSelected || options.videoSelected"
+        class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100" style="background:#232323">
           <fullscreen class="center" :fullscreen.sync="fullscreen" ref="fullscreen" @change="fullscreenChange">
-            <video  id="local" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
+            <video  id="inputVideoLocal" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
           </fullscreen>
         </md-content>
-
         <!-- Remote Video -->
         <md-content
-          v-show="video === 'sendrecv' || video === 'recvonly'"
-          class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100">
+        v-show="
+        ( ['sendrecv','recvonly'].includes(video) || ['sendrecv','recvonly'].includes(audio) )
+        && userIdRemote"
+        class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100" style="background:#232323">
           <fullscreen class="center" :fullscreen.sync="fullscreen" ref="fullscreen" @change="fullscreenChange">
-            <video  id="remote" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
+            <video  id="inputVideoRemote" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
           </fullscreen>
         </md-content>
       </md-card-media>
 
       <md-card-header>
         <!-- Username -->
-        <md-field 
-          v-show="video === 'sendrecv' || video === 'sendonly' || audio === 'sendrecv' || audio === 'sendonly' || data === 'sendrecv' || data  === 'sendonly' || file === 'sendrecv' || file === 'sendonly'"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
-          <md-input  id="username" readonly="readonly" placeholder="ID (auto generated)" :value="currentUser"/>
+        <md-field v-show="showUserIdLocal" class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
+          <md-input  id="inputUserIdLocal" v-model="userIdLocal" readonly="readonly" placeholder="ID (auto generated)" />
         </md-field>
         <!-- Username to call -->
-        <md-field 
-          v-show="connectionState !== '' && (video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data  === 'recvonly' || file === 'sendrecv' || file === 'recvonly')"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
-          <md-input  id="username-to-call" placeholder="ID to call" />
+        <md-field  
+        v-show="userIdLocal"
+        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
+          <md-input id="inputUserIdRemote" v-model="userIdRemote" autocomplete="off" placeholder="Remote ID" />
         </md-field>
       </md-card-header>
 
       <md-card-content>
         <!-- Video input -->
-        <md-field 
-          v-show="video === 'sendrecv' || video === 'sendonly'"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
-          <md-select id="videoinput" v-model="videoSelected" placeholder="Video input">
-            <md-option v-for="item in optionsVideo" v-bind:key="item.value" :value="item.value">{{item.text}}</md-option>
+        <md-field
+        v-show="['sendrecv','sendonly'].includes(video)"
+        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
+          <md-select id="inputDevicesVideo" v-model="options.videoSelected" placeholder="Video input">
+            <md-option v-for="item in options.video" v-bind:key="item.value" :value="item.value" :selected="item.selected">{{item.text}}</md-option>
           </md-select>
         </md-field>
         <!-- Audion input -->
         <md-field 
-          v-show="audio === 'sendrecv' || audio === 'sendonly'"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
-          <md-select id="audioinput" v-model="audioSelected" placeholder="Audio input">
-            <md-option v-for="item in optionsAudio" v-bind:key="item.value" :value="item.value"  :selected="true">{{item.text}}</md-option>
+        v-show="['sendrecv','sendonly'].includes(audio)"
+        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100">
+          <md-select id="inputDevicesAudio" v-model="options.audioSelected" placeholder="Audio input">
+            <md-option v-for="item in options.audio" v-bind:key="item.value" :value="item.value"  :selected="item.selected">{{item.text}}</md-option>
           </md-select>
         </md-field>
-        
         <!-- Connection status -->
-        <md-field 
-          v-show="1"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-input  id="state" readonly="readonly"  placeholder="Connection status" :value="connectionState"/>
+        <md-field v-show="1" class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
+          <md-input  id="inputConnectionStatus" readonly="readonly"  placeholder="Connection status" :value="connectionStatus"/>
         </md-field>
-
         <!-- Text message remote --->
         <md-field 
-          v-show="data === 'sendrecv' || data === 'sendonly'"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-textarea readonly="readonly" id="message-output" placeholder="Messages will be displayed here." />
+        v-show="!['inactive'].includes(data)"
+        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
+          <md-textarea id="inputTextRemote" readonly="readonly" placeholder="Messages will be displayed here." />
         </md-field>
-        
         <!-- Text message local --->
-        <md-field 
-          v-show="data === 'sendrecv' || data === 'sendonly'"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-input  id="message-input" placeholder="Messages input" />
+        <md-field
+        v-show="data !== 'inactive' && userIdRemote"
+        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
+          <md-input  id="inputTextLocal" autocomplete='off' placeholder="Messages input" />
         </md-field>
-        
         <!-- File local --->
         <md-field 
-          v-show="file === 'sendrecv' || file === 'sendonly'"
-          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-file  id="file-local" placeholder="File to share" />
+        v-show="['sedrecv','sendonly'].includes(file)"
+        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
+          <md-file  id="inputDataFileLocal" multiple="multiple" placeholder="File to share" />
         </md-field>
-        
-
       </md-card-content>
       <div style="clear:both"></div>
       <md-card-actions>
-        <!-- Register and Dial -->
         <div style="clear:both"></div>
-
         <md-button
-          v-show="downloadReceived !== ''"
-          class="md-layout-item md-xlarge-size-20"><a href="#" id="downloadAnchor" >Download</a></md-button>
-        <md-button
-          id="login"
-          v-show="currentUser === '' "
-          class="md-layout-item md-xlarge-size-20">Register</md-button>
+        v-show="showBtnDownload"
+        id="btnDl"      class="md-layout-item md-xlarge-size-20"><a href="#" id="downloadAnchor" >Download</a></md-button>
         <md-button 
-          v-show="currentUser !== '' && ( video === 'sendrecv' || video === 'recvonly' || audio === 'sendrecv' || audio === 'recvonly' || data === 'sendrecv' || data === 'recvonly' || file === 'sendrecv' || file === 'recvonly' )"
-          id="call-make"
-          class="md-layout-item md-xlarge-size-20">Dial</md-button>
+        v-show="userIdLocal
+          && ( ( options.videoSelected || options.audioSelected ) || ['sendonly','sendrecv'].includes(file) )
+          "
+        id="btnStream"  class="md-layout-item md-xlarge-size-20">Stream</md-button>
         <md-button 
-          v-show="remoteUser !== '' && (data === 'sendrecv' || data === 'sendonly')"
-          id="sendMsg"
-          class="md-layout-item md-xlarge-size-20">Send</md-button>
-
+        v-show="
+        ( ['recvonly','sendrecv'].includes(video) || ['recvonly','sendrecv'].includes(audio) || data !== 'inactive' || ['recvonly','sendrecv'].includes(file)  )
+        && userIdRemote"
+        id="btnCall"    class="md-layout-item md-xlarge-size-20">Dial</md-button>
+        <md-button 
+        v-show="userIdRemote && data !== 'inactive'"
+        id="btnSend"    class="md-layout-item md-xlarge-size-20">Send</md-button>
       </md-card-actions>
     </md-card>
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #controlls video{
   object-fit: contain;
   height:100%;
@@ -124,151 +112,115 @@
 .center{
   margin: 0 auto;
 }
+.hidden{
+  display:none !important
+}
 </style>
 <script>
 export default {
-    methods: {
-      togglefullscreen () {
-        this.$refs['fullscreen'].toggle()
-      },
-      fullscreenChange (fullscreen) {
-        this.fullscreen = fullscreen
-      }
+  methods: {
+    togglefullscreen () {
+      this.$refs['fullscreen'].toggle()
     },
-    props: ['audio','video','data','file'],
-    data: () => ({
-        downloadReceived:'',
-        connectionState:'',
-        currentUser:'',
-        remoteUser:'',
-        connections:[],
-        fullscreen:false,
-        audioSelected: '',
-        optionsAudio: [],
-        videoSelected: '',
-        optionsVideo: []
-      }),
-      mounted() {
-          
-          let init = () => {
-            let connection        = null
-            let otherUsername     = null
-            let messageIn         = document.querySelector('input#message-input')
-            let fileLocal         = document.querySelector('input#file-local')
-            let messageOut        = document.querySelector('textarea#message-output')
-            let local             = document.querySelector('video#local')
-            let remote            = document.querySelector('video#remote')
-            let remoteName        = document.querySelector('#username-to-call')
-            let btnLogin          = document.querySelector('button#login')
-            let callBtn           = document.querySelector('button#call-make')
-            let sendBtn           = document.querySelector('button#sendMsg')
-            let downloadAnchor    = document.querySelector('#downloadAnchor')
-            let hash              = window.location.hash.substr(1)
-            let ws                = null
-            let wsConnect         = ( )           => { 
-                  ws = new WebSocket('wss://seqr.link:3001/socket')
-                  ws.onclose        = ( )           => { setTimeout(wsConnect, 1000) }
-                  ws.onerror        = ( )           => { ws.close() }
-                }
-                wsConnect()
+    fullscreenChange (fullscreen) {
+      this.fullscreen = fullscreen
+    }
+  },
+  props: ['audio','video','data','file'],
+  data: () => ({
+      options:{
+        optionsAudio:[],
+        optionsVideo:[]
+      },
+      downloadReceived:'',
+      userIdLocal:'',
+      userIdRemote:'',
+      connections:[],
+      fullscreen:false,
+      connectionStatus:'',
+      dataFileLocal:null,
+      
+      showBtnDial:false,
+      showBtnDownload:false,
+      showBtnSend:false,
+      showBtnStream:false,
+      showDataFileLocal:false,
+      showDataTextLocal:false,
+      showDataTextRemote:false,
+      showDevicesAudio:false,
+      showDevicesVideo:false,
+      showConnnectionStatus:false,
+      showUserIdLocal:true,
+      showUserIdRemote:false,
+      showVideoLocal:false,
+      showVideoRemote:false
+    }),
+    mounted() {
 
-            let connectionState   = (conn)        => { return (conn.connectionState || conn.iceConnectionState) }
-            let checkState        = (conn)        => { return  ['new','connecting','failed','disconnected'].includes(connectionState(conn)) }
-            let error             = error         => { d(error) }
-            let answer            = answr         => { connection.setLocalDescription(answr); sendMessage({type: 'answer',answer: answr}) }
-            let offer             = ofr           => { sendMessage({ type: 'offer', offer: ofr }); connection.setLocalDescription(ofr)}
-            let makeCall          = ()            => { otherUsername = remoteName.value; connection.createOffer( offer,error ) }
-            let sendMessage       = message       => { message.otherUsername = otherUsername; ws.send(JSON.stringify(message)) }
-            let login             = ()            => { sendMessage({type: 'login',uuid: hash}) }
-            let displayMsg        = (m)           => { messageOut.value += m + '\n'; messageOut.scrollTop = messageOut.scrollHeight  }
-            let d                 = (e)           => { /* eslint-disable no-console */ console.log(e) /* eslint-enable no-console */}
-            let _close            = ()            => { }
-            let _answer           = data          => { if( checkState(connection)) connection.setRemoteDescription(new RTCSessionDescription(data.answer)) }
-            let _candidate        = data          => { if( checkState(connection)) connection.addIceCandidate     (new RTCIceCandidate(data.candidate))    }
-            let _offer            = data          => { if( checkState(connection)) otherUsername = data.username; connection.setRemoteDescription(new RTCSessionDescription(data.offer)); connection.createAnswer(answer,error) }
-            let _login            = data          => {
-                local.volume = 0
-                local.style.visibility = 'visible'
-                this.currentUser = data.success
-                createConnection()
-            }
-            let sendMsg           = ()            => { 
-              if(messageIn.value){ 
-                connection.dataChannel.send(messageIn.value)
-                displayMsg('>' + messageIn.value)
-                messageIn.value = ''
-              }
-            }
-            let createConnection  = async ()      => {
-                    connection = new RTCPeerConnection({ iceServers: [{ urls: ['stun:seqr.link:3478'] }] })
-                this.connections.push(connection)
-                let audio     = ( this.audioSelected === 'none' ? false : { deviceId: { exact: this.audioSelected }} )
-                let video     = ( this.videoSelected === 'none' ? false : { deviceId: { exact: this.videoSelected}} )
-                let hasMedia  = ( audio || video )
-                if(hasMedia){
-                  let localStream = await navigator.mediaDevices.getUserMedia({video: video,audio: audio })
-                  local.srcObject = localStream
-                  connection.addStream(localStream)
-                }
+  /* eslint-disable */
+      (async () => {
+       /* !TODO Multiple instances */
+        if(this.$root.$data.rtc){ await this.$root.$data.rtc._destroy(); this.$root.$data.rtc = null }
 
-                if(this.data || ['sendrecv','sendonly','recvonly'].includes(this.file) ){
-                  connection.dataChannel           = connection.createDataChannel({ ordered: false, maxPacketLifeTime: 3000, })
-                  connection.dataChannel.onerror   = error => { d("Data Channel Error:", error) }
-                  connection.dataChannel.onmessage = event => { d("Got Data Channel Message:", event.data) }
-                  connection.dataChannel.onclose   = ()    => { d("The Data Channel is Closed") }
-                  connection.dataChannel.onopen    = ()    => { d("--- connected ---") }
-                  connection.dataChannel.onopen    = ()    => { if(fileLocal.files.length) fileLocal.files[0].arrayBuffer().then(buff => { connection.dataChannel.send(buff) }) }
-
-                  connection.ondatachannel = (event) =>{ 
-                    event.channel.onmessage = (e) => {
-                      if(typeof e.data === 'object'){
-                        d('Receiving')
-                        downloadAnchor.href = URL.createObjectURL(new Blob([e.data]))
-                        downloadAnchor.download = 'seqr.bin'
-                        this.downloadReceived = 'Download'
-                      }
-                      else displayMsg('<' + e.data)
-                    }
-                  }
-                }
-
-                connection.addTransceiver('video',{currentDirection:this.video})
-                connection.addTransceiver('audio',{currentDirection:this.audio})
-                connection.ontrack                      = event  => { remote.srcObject = event.stream }
-                connection.onaddstream                  = connection.ontrack
-                connection.onicecandidate               = event  => { if (event.candidate) sendMessage({ type: 'candidate', candidate: event.candidate }) }
-                connection.onconnectionstatechange      = () => { this.connectionState = connectionState(connection) }
-                connection.oniceconnectionstatechange   = connection.onconnectionstatechange
-                this.connectionState = connectionState(connection)
-            }
-
-            let handlers            =                   {_login:_login,_offer:_offer,_answer:_answer,_candidate:_candidate,_close:_close}
-            ws.onopen               = ()             => { d('Connected to the signaling server') }
-            ws.onmessage            = msg            => { let data = JSON.parse(msg.data); handlers[data.type](data) }
-            ws.onerror              = error
-            btnLogin    .addEventListener('click', login    )
-            callBtn     .addEventListener('click', makeCall )
-            sendBtn     .addEventListener('click', sendMsg  )
-            messageIn   .addEventListener('keypress', e => { (e.key === 'Enter' ? sendMsg : ()=>{} )() })
-            
-            let defaultVideo = {text: 'No video selected', value: 'none'}
-            let defaultAudio = {text: 'No audio selected', value: 'none'}
-            this.optionsVideo.push(defaultVideo)
-            this.optionsAudio.push(defaultAudio)
-            navigator.mediaDevices.enumerateDevices().then(dev => {
-                dev.map((dev) => { 
-                  if(dev.kind === 'videoinput') this.optionsVideo.push({text: dev.label, value: dev.deviceId})
-                  if(dev.kind === 'audioinput') this.optionsAudio.push({text: dev.label, value: dev.deviceId})
-                })
-                this.videoSelected = defaultVideo.value
-                this.audioSelected = defaultAudio.value
-
-                if(['sendrcv','sendonly'].includes(this.video)) this.videoSelected = this.optionsVideo[1].value
-                if(['sendrcv','sendonly'].includes(this.audio)) this.audioSelected = this.optionsAudio[1].value
-              }
-            )
+        const loadJs = function(d, s, id, src, cb){
+          let js, fjs = d.getElementsByTagName(s)[0]
+          if (d.getElementById(id)){ return cb(); } // call cb if function is called on allready existing element
+          js = d.createElement(s)
+          js.id = id
+          js.type = 'text/javascript'
+          js.async = true
+          js.defer = true
+          js.onload = () => { (typeof cb === 'function' ? cb() : () => {} ) }
+          js.src = src
+          fjs.parentNode.insertBefore(js, fjs)
         }
-        init()
+
+        let inputVideoLocal   = document.querySelector('#inputVideoLocal')
+        let inputVideoRemote  = document.querySelector('#inputVideoRemote')
+        let btnStream         = document.querySelector('#btnStream')
+        let btnCall           = document.querySelector('#btnCall')
+        let btnSend           = document.querySelector('#btnSend')
+        let inputUserIdRemote = document.querySelector('#inputUserIdRemote')
+        let inputUserIdLocal  = document.querySelector('#inputUserIdLocal')
+        let inputTextLocal    = document.querySelector('#inputTextLocal')
+        let inputTextRemote   = document.querySelector('#inputTextRemote')
+        let inputDataFileLocal= document.querySelector('#inputDataFileLocal')
+        let downloadAnchor    = document.querySelector('#downloadAnchor')
+        let displayMsg        = async (m  )            => { inputTextRemote.value += '<<' + m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
+        let sendMessage       = async (rtc,m)          => { inputTextRemote.value += '>>' + m + '\n'; rtc.dataSend(m) }
+        let mediaSrc          = async (rtc)            => { this.options = await rtc._showMedia() }
+        let addDevices        = async (rtc)            => { rtc._addDevices(this.options.audioSelected,this.options.videoSelected) }
+        let dataReceived      = async (rtc,updateData) => { displayMsg(updateData.dataReceived.data) }
+        inputVideoLocal.volume= 0
+
+        let onUpdate          = async (rtc,updateData) => {
+          this.connectionStatus       =  updateData.connectionState
+          this.userIdLocal            =  updateData.userIdLocal  || ''
+          this.userIdRemote           =  updateData.userIdRemote || ''
+          inputVideoLocal .srcObject  =  updateData.streamLocal
+          inputVideoRemote.srcObject  =  updateData.streamRemote
+               if(updateData.message === rtc.MSG_SOCKET_CONNECTED  ) mediaSrc     (rtc)
+          else if(updateData.message === rtc.MSG_DATA_RECEIVED     ) dataReceived (rtc,updateData)
+        }
+        
+        loadJs(document, 'script', 'media-socket',"https://192.168.1.105:3001/client.js", () => {
+          this.$root.$data.rtc = new NkRtcClass({
+            socketAddr:     'wss://seqr.link:3001/socket',
+            audioDirection: this.audio,
+            videoDirection: this.video,
+            dataDirection:  this.data,
+            fileDirection:  this.file,
+            stunServers:    ['stun:seqr.link:3478'],
+            onUpdate:       (updateData) => { onUpdate(this.$root.$data.rtc,updateData) }
+          })
+          let rtc = this.$root.$data.rtc
+          btnStream       .addEventListener('click', () => { addDevices(rtc) })
+          btnCall         .addEventListener('click', () => { rtc.dial(this.userIdRemote) })
+          btnSend         .addEventListener('click', () => { sendMessage(rtc,inputTextLocal.value) })
+          inputTextLocal  .addEventListener('keypress', e => { (e.key === 'Enter' ? sendMessage(rtc,inputTextLocal.value) : false ) })
+        })
+      })()
+  /* eslint-enable */
     }
 }
 </script>

@@ -10,8 +10,8 @@ const app       = express()
 const uuidv     = require('uuid/v4')
 const users     = {}
 const sendTo    = (ws, message) => {  if(typeof ws === 'object') ws.send(JSON.stringify(message)) }
-const cert      = fs.readFileSync('./crt/certificate.pem')
-const key       = fs.readFileSync('./crt/key.pem')
+const cert      = fs.readFileSync('./certificate.pem')
+const key       = fs.readFileSync('./key.pem')
 const server    = https.createServer({cert:cert,key:key},app)
 const wss       = new WebSocket.Server({ server: server , path: '/socket'})
 const cwd       = process.cwd()
@@ -92,5 +92,7 @@ d('Starting stund on: ' + localIp)
      stund       .on('close', code => console.log   )
 
 d('Starting server on: https://' + localIp + ':' + PORT)
-app.get('/', (req, res) => { d('Reuested /'); res.send('working') } )
+app.get('/',          (req, res) => { res.send('working') } )
+app.get('/client.js', (req, res) => { res.sendFile(cwd +'/client.js') } )
+
 server.listen(PORT)

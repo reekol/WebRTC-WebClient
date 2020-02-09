@@ -8,8 +8,10 @@
           content1="One way audio"
           content2="One way video"
           content3="..."
-          linkstreamer="/rtc/cam/security/streamer"
-          linkclient="/rtc/cam/security/client"
+          link1="/rtc/cam/security/streamer"
+          link2="/rtc/cam/security/client"
+          btn1="Streamer"
+          btn2="client"
         />
 
         <card-offer 
@@ -20,8 +22,10 @@
           content1="One way audio"
           content2="One way video"
           content3="..."
-          linkstreamer="/rtc/cam/babyphone/streamer"
-          linkclient="/rtc/cam/babyphone/client"
+          link1="/rtc/cam/babyphone/streamer"
+          link2="/rtc/cam/babyphone/client"
+          btn1="Streamer"
+          btn2="client"
         />
         
         <card-offer 
@@ -32,7 +36,8 @@
           content1="Two way audio"
           content2="..."
           content3="..."
-          linkcall="/rtc/cam/phone/call"
+          link1="/rtc/cam/phone/call"
+          btn1="Phone call"
         />
         
         <card-offer 
@@ -43,18 +48,20 @@
           content1="Two way audio"
           content2="Two way video"
           content3="..."
-          linkcall="/rtc/cam/video/call"
+          link1="/rtc/cam/video/call"
+          btn1="Video call"
         />
         
         <card-offer 
           linkhead="/rtc/cam/data/call"
           image="/assets/chat.png"
-          title="Free chat messages."
+          title="Chat messanger."
           subhead="Free for non commersial use."
-          content1="Two way data channel."
+          content1="Two way data."
           content2="..."
           content3="..."
-          linkcall="/rtc/cam/data/call"
+          link1="/rtc/cam/data/call"
+          btn1="Chat"
         />
         
 <!--        <card-offer 
@@ -62,11 +69,13 @@
           image="/assets/track.png"
           title="Track device."
           subhead="Free for non commersial use."
-          content1="One way data channel."
+          content1="One way data."
           content2="..."
           content3="..."
-          linkstreamer="/rtc/cam/data/streamer"
-          linkclient="/rtc/cam/data/client" 
+          link1="/rtc/cam/data/streamer"
+          link2="/rtc/cam/data/client"
+          btn1="Track"
+          btn2="Follow"
         />-->
         
         <card-offer 
@@ -74,11 +83,24 @@
           image="/assets/file.png"
           title="File sharing."
           subhead="Free for non commersial use."
-          content1="Two way data channel."
+          content1="Two way data."
           content2="..."
           content3="..."
-          linkstreamer="/rtc/cam/file/streamer"
-          linkclient="/rtc/cam/file/client" 
+          link1="/rtc/cam/file/streamer"
+          link2="/rtc/cam/file/client" 
+          btn1="Share"
+          btn2="Download"
+        />
+        <card-offer 
+          linkhead="/rtc/register"
+          image="/assets/profile.png"
+          title="Registration."
+          subhead="Free for non commersial use."
+          content1="Permanent ID."
+          content2="..."
+          content3="..."
+          link1="/rtc/register" 
+          btn1="Register"
         />
 
     </div>

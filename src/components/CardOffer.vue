@@ -22,16 +22,18 @@
       <div style="clear:both"></div>
 
       <md-card-actions>
-        <router-link v-if="linkstreamer" :to="`${linkstreamer}`"><md-button>Streamer</md-button></router-link>
-        <router-link v-if="linkclient" :to="`${linkclient}`"><md-button>Client</md-button></router-link>
-        <router-link v-if="linkcall" :to="`${linkcall}`"><md-button>Call</md-button></router-link>
+        <router-link v-if="link1" :to="`${link1}`"><md-button>{{btn1}}</md-button></router-link>
+        <router-link v-if="link2" :to="`${link2}`"><md-button>{{btn2}}</md-button></router-link>
       </md-card-actions>
     </md-card>
 </template>
 
 <style lang="scss" scoped>
+  .md-title{
+    font-size:18px !important
+  }
   .md-card {
-    width: 260px;
+    width: 220px;
     margin: 20px;
     margin-top:auto;
     display: inline-block;
@@ -54,9 +56,10 @@
 export default {
     props: [
       'linkhead',
-      'linkstreamer',
-      'linkclient',
-      'linkcall',
+      'link1',
+      'link2',
+      'btn1',
+      'btn2',
       'image',
       'title',
       'subhead',

@@ -13,7 +13,6 @@ import "vue-material/dist/theme/black-green-light.css" // default, default-dark,
 Vue.use(VueRouter)
 Vue.use(VueMaterial)
 Vue.use(VueFullscreen)
-
 const router = new VueRouter({
   mode: 'history',
   base: __dirname,
@@ -27,7 +26,6 @@ const router = new VueRouter({
     { path: '/rtc/cam/phone/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'inactive', data:'inactive', file:'inactive'}},
     { path: '/rtc/cam/video/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'sendrecv', data:'inactive', file:'inactive'}},
     { path: '/rtc/cam/data/call',         component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'sendrecv', file:'inactive'}},
-    { path: '/rtc/cam/file/call',         component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'sendrecv'}},
     { path: '/rtc/cam/file/streamer',     component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'sendonly'}},
     { path: '/rtc/cam/file/client',       component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'recvonly'}},
     { path: '/rtc/*',                     component: NotFound }
@@ -39,6 +37,7 @@ new Vue({
   render: h => h(Main),
   data: () => ({
     n: 0 ,
-    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://localhost:8081'
+    rtc:null,
+    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://192.168.1.105:8080'
   })
 }).$mount('#app')
