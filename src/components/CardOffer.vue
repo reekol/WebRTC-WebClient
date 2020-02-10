@@ -1,5 +1,5 @@
 <template>
-    <md-card class="md-elevation-24 md-primary" md-theme="ree-card">
+    <md-card class="md-elevation-24" >
       <md-card-media>
         <router-link v-if="linkhead" :to="`${linkhead}`">
           <font-awesome-icon :icon="image" class="fa" />

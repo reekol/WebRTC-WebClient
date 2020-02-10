@@ -25,14 +25,6 @@ export default {
 
 <style lang="scss">
 
-@import "~vue-material/dist/theme/engine";
-@include md-register-theme("ree-card", (
-  primary: md-get-palette-color(white, A200), // The primary color of your application
-  accent: md-get-palette-color(red, A200), // The accent or secondary color
-  theme: light // This can be dark or light
-));
-@import "~vue-material/dist/theme/all";
-
 .clear{ clear:both }
 .hidden{ display:none }
 .float-left{ float:left }
