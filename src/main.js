@@ -12,11 +12,11 @@ import "vue-material/dist/vue-material.min.css"
 import "vue-material/dist/theme/black-green-light.css" // default, default-dark, black-green-dark, black-green-light
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faUserCircle } from '@fortawesome/free-solid-svg-icons'
-import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons'
+import { faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faUserCircle,faBug,faExternalLinkSquareAlt} from '@fortawesome/free-solid-svg-icons'
+import { faFacebookSquare,faTelegram,faWhatsappSquare,faSkype  } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faFacebookSquare,faUserCircle)
+library.add(faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faFacebookSquare,faBug,faExternalLinkSquareAlt,faUserCircle,faTelegram,faWhatsappSquare,faSkype)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.use(SocialSharing)

@@ -2,8 +2,8 @@
     <div style="padding-top:50px">
         <card-offer 
           linkhead="/rtc/cam/security/streamer"
-          image="/assets/404.png"
-          title="Ooops!"
+          image="bug"
+          title="Ooops! 404 NOT FOUND."
           subhead="I wish i could see this when."
           content1="i'am lookin for plastic in the ocean."
           content2="Finding war zones in world map."

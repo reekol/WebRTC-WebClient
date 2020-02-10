@@ -3,21 +3,24 @@
     <md-card 
       style="margin-top:50px;display:block"
       id="controlls"
-      class="center md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-100" >
+      class="center md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-90" >
 
       <social-sharing :url="fullPath"
-        class="social"
+        v-show="!userIdRemote"
         title="SeQR streemer share"
         description="Someone wants to talk with you on privete P2P session."
         quote="SeQR RTC is a way for privte P2P comunication"
         hashtags="#SeQR"
         inline-template>
-        <div>
-            <network network="email"><font-awesome-icon icon="envelope"  /></network>&nbsp;
-            <network network="facebook"><font-awesome-icon :icon="['fab', 'facebook-square']"  /></network>
+        <div class="social">
+            <network network="email"   ><font-awesome-icon icon="envelope"  /></network>&nbsp;
+            <network network="facebook"><font-awesome-icon :icon="['fab', 'facebook-square']"  /></network>&nbsp;
+            <network network="telegram"><font-awesome-icon :icon="['fab', 'telegram']"  /></network>&nbsp;
+            <network network="skype"   ><font-awesome-icon :icon="['fab', 'skype']"  /></network>&nbsp;
+            <network network="whatsapp"><font-awesome-icon :icon="['fab', 'whatsapp-square']"  /></network>&nbsp;
         </div>
-      </social-sharing>
-
+       </social-sharing>
+       <a       v-show="!userIdRemote" class="social" :href="fullPath" target="_new"><font-awesome-icon icon="external-link-square-alt"  />&nbsp;</a>
       <md-card-media>
         <!-- Local Video -->
         <md-content 
@@ -200,6 +203,7 @@ export default {
           fjs.parentNode.insertBefore(js, fjs)
         }
 
+        this.userIdRemote     = window.location.hash || ''
         let inputTextRemote   = document.querySelector('#inputTextRemote')
         let displayMsg        = async (m  )            => { this.textRemote += m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
         let sendMessage       = async (rtc,m)          => { displayMsg('⇨ ' + m); rtc.dataSend(m); this.textLocal='' }
@@ -208,9 +212,11 @@ export default {
         let onUpdate          = async (rtc,updateData) => {
           this.connectionStatus       = updateData.connectionState
           this.userIdLocal            = updateData.userIdLocal  || ''
-          this.userIdRemote           = updateData.userIdRemote || ''
+          this.userIdRemote           = updateData.userIdRemote || window.location.hash.substr(1) || ''
           this.srcObjectLocal         = updateData.streamLocal
           this.srcObjectRemote        = updateData.streamRemote
+          this.fullPath               = this.$root.$data.path + this.$router.currentRoute.path.replace('streamer','client') + '#' + this.userIdLocal
+
           if(updateData.message === rtc.MSG_DATA_RECEIVED) displayMsg('⇦ ' + updateData.dataReceived)
         }
         

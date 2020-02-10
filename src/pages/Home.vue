@@ -63,7 +63,7 @@
           link1="/rtc/cam/data/call"
           btn1="Chat"
         />
-        
+<!--
         <card-offer 
           linkhead="/rtc/cam/data/call"
           image="map-marker-alt"
@@ -102,7 +102,7 @@
           link1="/rtc/register" 
           btn1="Register"
         />
-
+-->
     </div>
 </template>
 
