@@ -201,7 +201,7 @@ class NkRtcClass {
     this._connection.dataChannel.onmessage = event => { d("Got Data Channel Message:", event.data) }
     this._connection.dataChannel.onclose   = ()    => { d("The Data Channel is Closed") }
     this._connection.dataChannel.onopen    = ()    => { d("--- DC connected ---") }
-    this._connection.ondatachannel         = (event) =>{ event.channel.onmessage = (e) => { this._update({message:this.MSG_DATA_RECEIVED,data:e}) } }
+    this._connection.ondatachannel         = (event) =>{ event.channel.onmessage = (e) => { this._update({message:this.MSG_DATA_RECEIVED,data:e.data}) } }
   }
   async _showMedia(){
     let optionsAudio = [{text:'No audio',value:''}]
@@ -220,3 +220,69 @@ class NkRtcClass {
 }
 
 
+
+
+/***
+ * Example implementation *
+
+      (async () => {
+        if(this.$root.$data.rtc){ await this.$root.$data.rtc._destroy(); this.$root.$data.rtc = null }
+
+        const loadJs = function(d, s, id, src, cb){
+          let js, fjs = d.getElementsByTagName(s)[0]
+          if (d.getElementById(id)){ return cb(); } // call cb if function is called on allready existing element
+          js = d.createElement(s)
+          js.id = id
+          js.type = 'text/javascript'
+          js.async = true
+          js.defer = true
+          js.onload = () => { (typeof cb === 'function' ? cb() : () => {} ) }
+          js.src = src
+          fjs.parentNode.insertBefore(js, fjs)
+        }
+
+        let inputVideoLocal   = document.querySelector('#inputVideoLocal')
+        let inputVideoRemote  = document.querySelector('#inputVideoRemote')
+        let btnStream         = document.querySelector('#btnStream')
+        let btnCall           = document.querySelector('#btnCall')
+        let btnSend           = document.querySelector('#btnSend')
+        let inputUserIdRemote = document.querySelector('#inputUserIdRemote')
+        let inputUserIdLocal  = document.querySelector('#inputUserIdLocal')
+        let inputTextLocal    = document.querySelector('#inputTextLocal')
+        let inputTextRemote   = document.querySelector('#inputTextRemote')
+        let inputDataFileLocal= document.querySelector('#inputDataFileLocal')
+        let downloadAnchor    = document.querySelector('#downloadAnchor')
+        let displayMsg        = async (m  )            => { this.textRemote += m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
+        let mediaSrc          = async (rtc)            => { this.options = await rtc._showMedia() }
+        let addDevices        = async (rtc)            => { rtc._addDevices(this.options.audioSelected,this.options.videoSelected) }
+        let sendMessage       = async (rtc,m)          => { displayMsg('⇨ ' + m); rtc.dataSend(m); this.textLocal='' }
+        let dataReceived      = async (rtc,updateData) => { displayMsg('⇦ ' + updateData.dataReceived.data) }
+        inputVideoLocal.volume= 0
+
+        let onUpdate          = async (rtc,updateData) => {
+          this.connectionStatus       = updateData.connectionState
+          this.userIdLocal            = updateData.userIdLocal  || ''
+          this.userIdRemote           = updateData.userIdRemote || ''
+          inputVideoLocal .srcObject  = updateData.streamLocal
+          inputVideoRemote.srcObject  = updateData.streamRemote
+          if(updateData.message === rtc.MSG_DATA_RECEIVED) dataReceived (rtc,updateData)
+        }
+        
+        loadJs(document, 'script', 'media-socket',this.$root.$data.client, () => {
+          this.$root.$data.rtc = new NkRtcClass({
+            socketAddr:     this.$root.$data.socket,
+            audioDirection: this.audio,
+            videoDirection: this.video,
+            dataDirection:  this.data,
+            fileDirection:  this.file,
+            stunServers:    ['stun:seqr.link:3478'],
+            onUpdate:       (updateData) => { onUpdate(this.$root.$data.rtc,updateData) }
+          })
+          let rtc = this.$root.$data.rtc
+          btnStream       .addEventListener('click', () => { addDevices(rtc) })
+          btnCall         .addEventListener('click', () => { rtc.dial(this.userIdRemote) })
+          btnSend         .addEventListener('click', () => { sendMessage(rtc,this.textLocal) })
+          inputTextLocal  .addEventListener('keypress', e => { (e.key === 'Enter' ? sendMessage(rtc,this.textLocal) : false ) })
+        })
+      })()
+***/
