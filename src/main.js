@@ -27,18 +27,18 @@ const router = new VueRouter({
   mode: 'history',
   base: __dirname,
   routes: [
-    { path: '/rtc/',                      component: Home},
-    { path: '/rtc/about',                 component: About },
-    { path: '/rtc/cam/security/client',   component: MediaRtc, props: { audio:'recvonly', video: 'recvonly', data:'inactive', file:'inactive'}},
-    { path: '/rtc/cam/security/streamer', component: MediaRtc, props: { audio:'sendonly', video: 'sendonly', data:'inactive', file:'inactive'}},
-    { path: '/rtc/cam/babyphone/client',  component: MediaRtc, props: { audio:'recvonly', video: 'recvonly', data:'inactive', file:'inactive'}},
-    { path: '/rtc/cam/babyphone/streamer',component: MediaRtc, props: { audio:'sendonly', video: 'sendonly', data:'inactive', file:'inactive'}},
-    { path: '/rtc/cam/phone/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'inactive', data:'inactive', file:'inactive'}},
-    { path: '/rtc/cam/video/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'sendrecv', data:'inactive', file:'inactive'}},
-    { path: '/rtc/cam/data/call',         component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'sendrecv', file:'inactive'}},
-    { path: '/rtc/cam/file/streamer',     component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'sendonly'}},
-    { path: '/rtc/cam/file/client',       component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'recvonly'}},
-    { path: '/rtc/*',                     component: NotFound }
+    { path: '/',                      component: Home},
+    { path: '/about',                 component: About },
+    { path: '/cam/security/client',   component: MediaRtc, props: { audio:'recvonly', video: 'recvonly', data:'inactive', file:'inactive'}},
+    { path: '/cam/security/streamer', component: MediaRtc, props: { audio:'sendonly', video: 'sendonly', data:'inactive', file:'inactive'}},
+    { path: '/cam/babyphone/client',  component: MediaRtc, props: { audio:'recvonly', video: 'recvonly', data:'inactive', file:'inactive'}},
+    { path: '/cam/babyphone/streamer',component: MediaRtc, props: { audio:'sendonly', video: 'sendonly', data:'inactive', file:'inactive'}},
+    { path: '/cam/phone/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'inactive', data:'inactive', file:'inactive'}},
+    { path: '/cam/video/call',        component: MediaRtc, props: { audio:'sendrecv', video: 'sendrecv', data:'inactive', file:'inactive'}},
+    { path: '/cam/data/call',         component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'sendrecv', file:'inactive'}},
+    { path: '/cam/file/streamer',     component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'sendonly'}},
+    { path: '/cam/file/client',       component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'recvonly'}},
+    { path: '/*',                     component: NotFound }
   ]
 })
 
@@ -48,8 +48,8 @@ new Vue({
   data: () => ({
     n: 0 ,
     rtc:null,
-    path:  process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc'            :"https://192.168.1.105:8080",
-    client:process.env.NODE_ENV === 'production' ? "https://seqr.link:3001/client.js" :"https://192.168.1.105:3001/client.js",
-    socket:process.env.NODE_ENV === 'production' ? "wss://seqr.link:3001/socket"      :"wss://192.168.1.105:3001/socket"
+    path:  process.env.NODE_ENV === 'production' ? 'https://winterborn.org'            :"https://192.168.1.105:8080",
+    client:process.env.NODE_ENV === 'production' ? "https://winterborn.org:3001/client.js" :"https://192.168.1.105:3001/client.js",
+    socket:process.env.NODE_ENV === 'production' ? "wss://winterborn.org:3001/socket"      :"wss://192.168.1.105:3001/socket"
   })
 }).$mount('#app')
