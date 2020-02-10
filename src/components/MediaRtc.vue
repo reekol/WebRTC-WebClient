@@ -1,12 +1,12 @@
 <template>
   <div>
+    <br />
     <md-card 
-      style="margin-top:50px;display:block"
       id="controlls"
       class="center md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-90" >
 
       <social-sharing :url="fullPath"
-        v-show="!userIdRemote"
+        v-show="showShare"
         title="SeQR streemer share"
         description="Someone wants to talk with you on privete P2P session."
         quote="SeQR RTC is a way for privte P2P comunication"
@@ -20,7 +20,7 @@
             <network network="whatsapp"><font-awesome-icon :icon="['fab', 'whatsapp-square']"  /></network>&nbsp;
         </div>
        </social-sharing>
-       <a       v-show="!userIdRemote" class="social" :href="fullPath" target="_new"><font-awesome-icon icon="external-link-square-alt"  />&nbsp;</a>
+       <a       v-show="showShare" class="social" :href="fullPath" target="_new"><font-awesome-icon icon="external-link-square-alt"  />&nbsp;</a>
       <md-card-media>
         <!-- Local Video -->
         <md-content 
@@ -116,6 +116,7 @@
         id="btnSend"    class="md-layout-item md-xlarge-size-20">Send</md-button>
       </md-card-actions>
     </md-card>
+    <br />
   </div>
 </template>
 
@@ -156,6 +157,7 @@ export default {
         optionsAudio:[],
         optionsVideo:[]
       },
+      showShare:true,
       fullPath:null,
       downloadReceived:'',
       userIdLocal:'',
@@ -189,7 +191,7 @@ export default {
       (async () => {
       /* !TODO Multiple instances */
         if(this.$root.$data.rtc){ await this.$root.$data.rtc._destroy(); this.$root.$data.rtc = null }
-
+        this.showShare = (window.location.href.indexOf('client') === -1)
         const loadJs = function(d, s, id, src, cb){
           let js, fjs = d.getElementsByTagName(s)[0]
           if (d.getElementById(id)){ return cb(); } // call cb if function is called on allready existing element
