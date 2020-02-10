@@ -2,7 +2,7 @@
     <md-card class="md-elevation-24 md-primary" md-theme="ree-card">
       <md-card-media>
         <router-link v-if="linkhead" :to="`${linkhead}`">
-           <img v-if="image" :src="`${this.$root.$data.path}${image}`" :alt="`${title}`" style="width:70%" />
+          <font-awesome-icon :icon="image" class="fa" />
         </router-link>
       </md-card-media>
 
@@ -29,6 +29,10 @@
 </template>
 
 <style lang="scss" scoped>
+  .fa{
+    font-size:100px;
+    margin-top:20px
+  }
   .md-title{
     font-size:18px !important
   }

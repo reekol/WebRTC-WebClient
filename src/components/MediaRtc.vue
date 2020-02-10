@@ -1,9 +1,22 @@
 <template>
   <div>
     <md-card 
-      style="margin-top:50px"
+      style="margin-top:50px;display:block"
       id="controlls"
       class="center md-elevation-24 md-layout-item md-xlarge-size-30 md-large-size-40 md-big-size-60 md-medium-size-70 md-small-size-90 md-xsmall-size-100" >
+
+      <social-sharing :url="fullPath"
+        class="social"
+        title="SeQR streemer share"
+        description="Someone wants to talk with you on privete P2P session."
+        quote="SeQR RTC is a way for privte P2P comunication"
+        hashtags="#SeQR"
+        inline-template>
+        <div>
+            <network network="email"><font-awesome-icon icon="envelope"  /></network>&nbsp;
+            <network network="facebook"><font-awesome-icon :icon="['fab', 'facebook-square']"  /></network>
+        </div>
+      </social-sharing>
 
       <md-card-media>
         <!-- Local Video -->
@@ -11,7 +24,7 @@
         v-show="options.audioSelected || options.videoSelected"
         class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100" style="background:#232323">
           <fullscreen class="center" :fullscreen.sync="fullscreen" ref="fullscreen" @change="fullscreenChange">
-            <video  id="inputVideoLocal" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
+            <video  id="inputVideoLocal" autoplay :srcObject.prop="srcObjectLocal" :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
           </fullscreen>
         </md-content>
         <!-- Remote Video -->
@@ -21,7 +34,7 @@
         && userIdRemote"
         class="float-left md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100 md-small-size-100 md-xsmall-size-100" style="background:#232323">
           <fullscreen class="center" :fullscreen.sync="fullscreen" ref="fullscreen" @change="fullscreenChange">
-            <video  id="inputVideoRemote" autoplay :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
+            <video  id="inputVideoRemote" autoplay :srcObject.prop="srcObjectRemote" :poster="`${this.$root.$data.path}/assets/stream.png`" @click="togglefullscreen"></video>
           </fullscreen>
         </md-content>
       </md-card-media>
@@ -63,14 +76,14 @@
         <!-- Text message remote --->
         <md-field 
         v-show="!['inactive'].includes(data)"
-        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-textarea id="inputTextRemote" readonly="readonly" placeholder="Messages will be displayed here." />
+        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100" >
+          <md-textarea id="inputTextRemote" v-model='textRemote' readonly="readonly" placeholder="Messages will be displayed here." />
         </md-field>
         <!-- Text message local --->
         <md-field
         v-show="data !== 'inactive' && userIdRemote"
         class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
-          <md-input  id="inputTextLocal" autocomplete='off' placeholder="Messages input" />
+          <md-input  id="inputTextLocal" v-model='textLocal' autocomplete='off' placeholder="Messages input" />
         </md-field>
         <!-- File local --->
         <md-field 
@@ -96,7 +109,7 @@
         && userIdRemote"
         id="btnCall"    class="md-layout-item md-xlarge-size-20">Dial</md-button>
         <md-button 
-        v-show="userIdRemote && data !== 'inactive'"
+        v-show="userIdRemote && data !== 'inactive' && textLocal"
         id="btnSend"    class="md-layout-item md-xlarge-size-20">Send</md-button>
       </md-card-actions>
     </md-card>
@@ -104,6 +117,14 @@
 </template>
 
 <style lang="scss" scoped>
+.social{
+  font-size:30px;
+  margin:5px;
+  padding-left:3px;
+  float:left;
+  color:#6688ff;
+  cursor:pointer;
+}
 #controlls video{
   object-fit: contain;
   height:100%;
@@ -132,6 +153,7 @@ export default {
         optionsAudio:[],
         optionsVideo:[]
       },
+      fullPath:null,
       downloadReceived:'',
       userIdLocal:'',
       userIdRemote:'',
@@ -139,7 +161,10 @@ export default {
       fullscreen:false,
       connectionStatus:'',
       dataFileLocal:null,
-      
+      textLocal:'',
+      textRemote:'',
+      srcObjectLocal:null,
+      srcObjectRemote:null,
       showBtnDial:false,
       showBtnDownload:false,
       showBtnSend:false,
@@ -159,7 +184,7 @@ export default {
 
   /* eslint-disable */
       (async () => {
-       /* !TODO Multiple instances */
+      /* !TODO Multiple instances */
         if(this.$root.$data.rtc){ await this.$root.$data.rtc._destroy(); this.$root.$data.rtc = null }
 
         const loadJs = function(d, s, id, src, cb){
@@ -175,37 +200,23 @@ export default {
           fjs.parentNode.insertBefore(js, fjs)
         }
 
-        let inputVideoLocal   = document.querySelector('#inputVideoLocal')
-        let inputVideoRemote  = document.querySelector('#inputVideoRemote')
-        let btnStream         = document.querySelector('#btnStream')
-        let btnCall           = document.querySelector('#btnCall')
-        let btnSend           = document.querySelector('#btnSend')
-        let inputUserIdRemote = document.querySelector('#inputUserIdRemote')
-        let inputUserIdLocal  = document.querySelector('#inputUserIdLocal')
-        let inputTextLocal    = document.querySelector('#inputTextLocal')
         let inputTextRemote   = document.querySelector('#inputTextRemote')
-        let inputDataFileLocal= document.querySelector('#inputDataFileLocal')
-        let downloadAnchor    = document.querySelector('#downloadAnchor')
-        let displayMsg        = async (m  )            => { inputTextRemote.value += '<<' + m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
-        let sendMessage       = async (rtc,m)          => { inputTextRemote.value += '>>' + m + '\n'; rtc.dataSend(m) }
-        let mediaSrc          = async (rtc)            => { this.options = await rtc._showMedia() }
-        let addDevices        = async (rtc)            => { rtc._addDevices(this.options.audioSelected,this.options.videoSelected) }
-        let dataReceived      = async (rtc,updateData) => { displayMsg(updateData.dataReceived.data) }
+        let displayMsg        = async (m  )            => { this.textRemote += m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
+        let sendMessage       = async (rtc,m)          => { displayMsg('⇨ ' + m); rtc.dataSend(m); this.textLocal='' }
         inputVideoLocal.volume= 0
 
         let onUpdate          = async (rtc,updateData) => {
-          this.connectionStatus       =  updateData.connectionState
-          this.userIdLocal            =  updateData.userIdLocal  || ''
-          this.userIdRemote           =  updateData.userIdRemote || ''
-          inputVideoLocal .srcObject  =  updateData.streamLocal
-          inputVideoRemote.srcObject  =  updateData.streamRemote
-               if(updateData.message === rtc.MSG_SOCKET_CONNECTED  ) mediaSrc     (rtc)
-          else if(updateData.message === rtc.MSG_DATA_RECEIVED     ) dataReceived (rtc,updateData)
+          this.connectionStatus       = updateData.connectionState
+          this.userIdLocal            = updateData.userIdLocal  || ''
+          this.userIdRemote           = updateData.userIdRemote || ''
+          this.srcObjectLocal         = updateData.streamLocal
+          this.srcObjectRemote        = updateData.streamRemote
+          if(updateData.message === rtc.MSG_DATA_RECEIVED) displayMsg('⇦ ' + updateData.dataReceived)
         }
         
-        loadJs(document, 'script', 'media-socket',"https://192.168.1.105:3001/client.js", () => {
+        loadJs(document, 'script', 'media-socket',this.$root.$data.client, async () => {
           this.$root.$data.rtc = new NkRtcClass({
-            socketAddr:     'wss://seqr.link:3001/socket',
+            socketAddr:     this.$root.$data.socket,
             audioDirection: this.audio,
             videoDirection: this.video,
             dataDirection:  this.data,
@@ -213,11 +224,14 @@ export default {
             stunServers:    ['stun:seqr.link:3478'],
             onUpdate:       (updateData) => { onUpdate(this.$root.$data.rtc,updateData) }
           })
+          
           let rtc = this.$root.$data.rtc
-          btnStream       .addEventListener('click', () => { addDevices(rtc) })
-          btnCall         .addEventListener('click', () => { rtc.dial(this.userIdRemote) })
-          btnSend         .addEventListener('click', () => { sendMessage(rtc,inputTextLocal.value) })
-          inputTextLocal  .addEventListener('keypress', e => { (e.key === 'Enter' ? sendMessage(rtc,inputTextLocal.value) : false ) })
+          this.options = await rtc._showMedia() 
+          
+          document.querySelector('#btnStream')      .addEventListener('click',  () => { rtc._addDevices(this.options.audioSelected,this.options.videoSelected) })
+          document.querySelector('#btnCall')        .addEventListener('click',  () => { rtc.dial(this.userIdRemote) })
+          document.querySelector('#btnSend')        .addEventListener('click',  () => { sendMessage(rtc,this.textLocal) })
+          document.querySelector('#inputTextLocal') .addEventListener('keypress',e => { (e.key === 'Enter' ? sendMessage(rtc,this.textLocal) : false ) })
         })
       })()
   /* eslint-enable */
