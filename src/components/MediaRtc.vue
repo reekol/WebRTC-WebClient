@@ -10,10 +10,10 @@
         title="SeQR streemer share"
         description="Someone wants to talk with you on privete P2P session."
         quote="SeQR RTC is a way for privte P2P comunication"
-        hashtags="#SeQR"
+        hashtags="SeQR"
         inline-template>
         <div class="social">
-            <network network="email"   ><font-awesome-icon icon="envelope"  /></network>&nbsp;
+<!--            <network network="email"   ><font-awesome-icon icon="envelope"  /></network>&nbsp;-->
             <network network="facebook"><font-awesome-icon :icon="['fab', 'facebook-square']"  /></network>&nbsp;
             <network network="telegram"><font-awesome-icon :icon="['fab', 'telegram']"  /></network>&nbsp;
             <network network="skype"   ><font-awesome-icon :icon="['fab', 'skype']"  /></network>&nbsp;
