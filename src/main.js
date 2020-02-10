@@ -7,9 +7,19 @@ import MediaRtc from './components/MediaRtc.vue'
 import VueMaterial from "vue-material"
 import VueRouter from "vue-router"
 import VueFullscreen from 'vue-fullscreen'
+import SocialSharing from 'vue-social-sharing'
 import "vue-material/dist/vue-material.min.css"
 import "vue-material/dist/theme/black-green-light.css" // default, default-dark, black-green-dark, black-green-light
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faUserCircle } from '@fortawesome/free-solid-svg-icons'
+import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faFacebookSquare,faUserCircle)
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+
+Vue.use(SocialSharing)
 Vue.use(VueRouter)
 Vue.use(VueMaterial)
 Vue.use(VueFullscreen)
@@ -38,6 +48,8 @@ new Vue({
   data: () => ({
     n: 0 ,
     rtc:null,
-    path: process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc' : 'https://192.168.1.105:8080'
+    path:  process.env.NODE_ENV === 'production' ? 'https://seqr.link/rtc'            :"https://192.168.1.105:8080",
+    client:process.env.NODE_ENV === 'production' ? "https://seqr.link:3001/client.js" :"https://192.168.1.105:3001/client.js",
+    socket:process.env.NODE_ENV === 'production' ? "wss://seqr.link:3001/socket"      :"wss://192.168.1.105:3001/socket"
   })
 }).$mount('#app')

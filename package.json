@@ -13,6 +13,10 @@
   },
   "main": "background.js",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.27",
+    "@fortawesome/free-brands-svg-icons": "^5.12.1",
+    "@fortawesome/free-solid-svg-icons": "^5.12.1",
+    "@fortawesome/vue-fontawesome": "^0.1.9",
     "core-js": "^3.4.4",
     "express": "^4.17.1",
     "node-sass": "^4.13.1",
@@ -25,6 +29,7 @@
     "vue-fullscreen": "^2.1.5",
     "vue-material": "^1.0.0-beta-11",
     "vue-router": "^3.1.5",
+    "vue-social-sharing": "^2.4.7",
     "vuelidate": "^0.7.5",
     "ws": "^7.2.1"
   },

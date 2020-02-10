@@ -2,7 +2,7 @@
     <div style="padding-top:50px">
         <card-offer 
           linkhead="/rtc/cam/security/streamer"
-          image="/assets/security.png"
+          image="video"
           title="Security camera"
           subhead="Free for non commersial use."
           content1="One way audio"
@@ -16,7 +16,7 @@
 
         <card-offer 
           linkhead="/rtc/cam/babyphone/streamer"
-          image="/assets/baby.png"
+          image="baby"
           title="Baby monitor"
           subhead="Free for non commersial use."
           content1="One way audio"
@@ -30,7 +30,7 @@
         
         <card-offer 
           linkhead="/rtc/cam/phone/call"
-          image="/assets/phonecall.png"
+          image="phone"
           title="Free audio call"
           subhead="Free for non commersial use."
           content1="Two way audio"
@@ -42,7 +42,7 @@
         
         <card-offer 
           linkhead="/rtc/cam/video/call"
-          image="/assets/videocall.png"
+          image="film"
           title="Free video call"
           subhead="Free for non commersial use."
           content1="Two way audio"
@@ -54,7 +54,7 @@
         
         <card-offer 
           linkhead="/rtc/cam/data/call"
-          image="/assets/chat.png"
+          image="comments"
           title="Chat messanger."
           subhead="Free for non commersial use."
           content1="Two way data."
@@ -64,9 +64,9 @@
           btn1="Chat"
         />
         
-<!--        <card-offer 
+        <card-offer 
           linkhead="/rtc/cam/data/call"
-          image="/assets/track.png"
+          image="map-marker-alt"
           title="Track device."
           subhead="Free for non commersial use."
           content1="One way data."
@@ -76,11 +76,11 @@
           link2="/rtc/cam/data/client"
           btn1="Track"
           btn2="Follow"
-        />-->
+        />
         
         <card-offer 
           linkhead="/rtc/cam/file/call"
-          image="/assets/file.png"
+          image="file-upload"
           title="File sharing."
           subhead="Free for non commersial use."
           content1="Two way data."
@@ -93,7 +93,7 @@
         />
         <card-offer 
           linkhead="/rtc/register"
-          image="/assets/profile.png"
+          image="user-circle"
           title="Registration."
           subhead="Free for non commersial use."
           content1="Permanent ID."
