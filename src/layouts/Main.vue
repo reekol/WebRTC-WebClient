@@ -5,6 +5,7 @@
         <ul>
             <router-link tag="li" to="/">Home</router-link>
             <router-link tag="li" to="/about">About</router-link>
+            <li style="padding-left:100px"><font-awesome-icon icon="terminal" /> ReeKol</li>
         </ul>
     </div>
     <div class="centered-container">
@@ -24,7 +25,7 @@ export default {
 </script>
 
 <style lang="scss">
-
+.center{ margin: 0 auto;}
 .clear{ clear:both }
 .hidden{ display:none }
 .float-left{ float:left }

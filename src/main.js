@@ -12,11 +12,29 @@ import "vue-material/dist/vue-material.min.css"
 import "vue-material/dist/theme/black-green-light.css" // default, default-dark, black-green-dark, black-green-light
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faUserCircle,faBug,faExternalLinkSquareAlt} from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faUserCircle,faBug,faExternalLinkSquareAlt,faStar,faTerminal} from '@fortawesome/free-solid-svg-icons'
 import { faFacebookSquare,faTelegram,faWhatsappSquare,faSkype  } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faEnvelope,faVideo,faBaby,faPhone,faComments,faFilm,faFileUpload,faMapMarkerAlt,faFacebookSquare,faBug,faExternalLinkSquareAlt,faUserCircle,faTelegram,faWhatsappSquare,faSkype)
+library.add(
+  faEnvelope,
+  faVideo,
+  faBaby,
+  faPhone,
+  faComments,
+  faFilm,
+  faFileUpload,
+  faMapMarkerAlt,
+  faFacebookSquare,
+  faBug,
+  faExternalLinkSquareAlt,
+  faUserCircle,
+  faTelegram,
+  faWhatsappSquare,
+  faSkype,
+  faStar,
+  faTerminal
+)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.use(SocialSharing)
@@ -38,6 +56,7 @@ const router = new VueRouter({
     { path: '/cam/data/call',         component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'sendrecv', file:'inactive'}},
     { path: '/cam/file/streamer',     component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'sendonly'}},
     { path: '/cam/file/client',       component: MediaRtc, props: { audio:'inactive', video: 'inactive', data:'inactive', file:'recvonly'}},
+    { path: '/stack/all',             component: MediaRtc, props: { audio:'sendrecv', video: 'sendrecv', data:'sendrecv', file:'sendrecv'}}, 
     { path: '/*',                     component: NotFound }
   ]
 })
@@ -49,7 +68,7 @@ new Vue({
     n: 0 ,
     rtc:null,
     path:  process.env.NODE_ENV === 'production' ? 'https://winterborn.org'            :"https://192.168.1.105:8080",
-    client:process.env.NODE_ENV === 'production' ? "https://winterborn.org:3001/client.js" :"https://192.168.1.105:3001/client.js",
-    socket:process.env.NODE_ENV === 'production' ? "wss://winterborn.org:3001/socket"      :"wss://192.168.1.105:3001/socket"
+    client:process.env.NODE_ENV === 'production' ? "https://winterborn.org/client.js" :"https://192.168.1.105:3001/client.js",
+    socket:process.env.NODE_ENV === 'production' ? "wss://winterborn.org/socket"      :"wss://192.168.1.105:3001/socket"
   })
 }).$mount('#app')

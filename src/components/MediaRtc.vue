@@ -134,9 +134,6 @@
   height:100%;
   margin: 0 auto;
 }
-.center{
-  margin: 0 auto;
-}
 .hidden{
   display:none !important
 }
@@ -207,6 +204,7 @@ export default {
 
         this.userIdRemote     = window.location.hash || ''
         let inputTextRemote   = document.querySelector('#inputTextRemote')
+        
         let displayMsg        = async (m  )            => { this.textRemote += m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
         let sendMessage       = async (rtc,m)          => { displayMsg('⇨ ' + m); rtc.dataSend(m); this.textLocal='' }
         inputVideoLocal.volume= 0
@@ -218,7 +216,6 @@ export default {
           this.srcObjectLocal         = updateData.streamLocal
           this.srcObjectRemote        = updateData.streamRemote
           this.fullPath               = this.$root.$data.path + this.$router.currentRoute.path.replace('streamer','client') + '#' + this.userIdLocal
-
           if(updateData.message === rtc.MSG_DATA_RECEIVED) displayMsg('⇦ ' + updateData.dataReceived)
         }
         
@@ -235,7 +232,8 @@ export default {
           
           let rtc = this.$root.$data.rtc
           this.options = await rtc._showMedia() 
-          
+          if(['sendrecv','sendonly'].includes(this.audio) && this.options.audio.length > 1 ) this.options.audioSelected = this.options.audio[1].value
+          if(['sendrecv','sendonly'].includes(this.video) && this.options.video.length > 1 ) this.options.videoSelected = this.options.video[1].value
           document.querySelector('#btnStream')      .addEventListener('click',  () => { rtc._addDevices(this.options.audioSelected,this.options.videoSelected) })
           document.querySelector('#btnCall')        .addEventListener('click',  () => { rtc.dial(this.userIdRemote) })
           document.querySelector('#btnSend')        .addEventListener('click',  () => { sendMessage(rtc,this.textLocal) })
