@@ -154,6 +154,7 @@ export default {
         optionsAudio:[],
         optionsVideo:[]
       },
+      beepConnection:true,
       showShare:true,
       fullPath:null,
       downloadReceived:'',
@@ -201,6 +202,24 @@ export default {
           js.src = src
           fjs.parentNode.insertBefore(js, fjs)
         }
+        
+        let audioContext =new AudioContext() // browsers limit the number of concurrent audio contexts, so you better re-use'em
+        let beep = (vol, freq, duration) => {
+          let v=audioContext.createOscillator()
+          let u=audioContext.createGain()
+          v.connect(u)
+          v.frequency.value=freq
+          v.type="square"
+          u.connect(audioContext.destination)
+          u.gain.value=vol*0.01
+          v.start(audioContext.currentTime)
+          v.stop(audioContext.currentTime+duration*0.001)
+//           navigator.vibrate(1000) // you’ll have a device that buzzes for a second. Want to create interesting patterns? Then do something such as:
+//           navigator.vibrate(200)  // a short buzz indicating the action went fine
+//           navigator.vibrate(2000) //, a long buzz indicating there was some sort of error
+//           navigator.vibrate([300, 300, 300]) // 3 short buzzes indicating a task is completed
+          navigator.vibrate(1000)
+        }
 
         this.userIdRemote     = window.location.hash || ''
         let inputTextRemote   = document.querySelector('#inputTextRemote')
@@ -210,6 +229,7 @@ export default {
         inputVideoLocal.volume= 0
 
         let onUpdate          = async (rtc,updateData) => {
+          if(this.connectionStatus !== updateData.connectionState) beep(20, 6000, 100)
           this.connectionStatus       = updateData.connectionState
           this.userIdLocal            = updateData.userIdLocal  || ''
           this.userIdRemote           = updateData.userIdRemote || window.location.hash.substr(1) || ''

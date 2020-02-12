@@ -7,10 +7,10 @@
         <md-card-content>
         <p>
           This web page is an Web interface to  <a href="https://github.com/reekol/WebRTC">Reekol's WebRTC</a> Git project.<br />
-          Feel free to use it without any warranty for non commersial use.<br />
-          commersial use of any product from this web page (winterborn.org)<br /> IS PROHIBITED.<br />
-          For any custom implementations please contant the author at<br />
-          email: <a href="mailto:cupuyc+WebRTC@gmail.com" >cupuyc+WebRTC@gmail.com</a><br />
+          Feel free to use it without any warranty for non-commercial use.<br />
+          Commercial use of any product from this web page (winterborn.org)<br /> IS PROHIBITED.<br />
+          For any custom implementations please contact the author at<br />
+          Email: <a href="mailto:cupuyc+WebRTC@gmail.com" >cupuyc+WebRTC@gmail.com</a><br />
           <br />
         </p>
         <div style="text-align:left">
