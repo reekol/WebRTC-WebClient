@@ -16,6 +16,7 @@ class NkRtcClass {
     this.MSG_DATA_RECEIVED      = "Data received"
     this.MSG_CHUNK_RECEIVED     = "Data chunk deceived"
     this.MSG_FILE_READY         = "File ready to download"
+    this.MSG_SOCKET_DATA_SENT   = "Data was sent"
     
     this._lastFileConst         = {size:0,lastChunkNumber:0, lastChunkSize:0, chunks:[], receivedTotal:0,percents:0}
     this._lastFile              = this._lastFileConst
@@ -136,11 +137,9 @@ class NkRtcClass {
     this._connection.addIceCandidate(new RTCIceCandidate(data.candidate)) 
   }
   async dataSend    (msg  ){ 
-    d(['data send',msg])
     this._connection.dataChannel.send(msg) 
   }
   dataSendSync      (msg  ){ 
-    d(['data send',msg])
     this._connection.dataChannel.send(msg) 
   }
   async _rtcConnectionState(){ 
@@ -244,10 +243,21 @@ class NkRtcClass {
     }))
     let fileReader = new FileReader()
     let offset = 0
-    let readSlice = o => { fileReader.readAsArrayBuffer(file.slice(offset, o + this._chunkSize)) }
+    let readSlice = o => { fileReader.readAsArrayBuffer(file.slice(o, o + this._chunkSize)) }
     fileReader.addEventListener('error', error => console.error('Error reading file:', error))
     fileReader.addEventListener('abort', event => console.log('File reading aborted:', event))
-    fileReader.addEventListener('load' , event => { this.dataSendSync(event.target.result); offset += event.target.result.byteLength; if (offset < file.size) readSlice(offset) })
+    fileReader.addEventListener('load' , event => { 
+      this.dataSendSync(event.target.result)
+      offset += event.target.result.byteLength
+      this._update({message:this.MSG_SOCKET_DATA_SENT,data:{
+        name:file.name,
+        size:file.size,
+        type:file.type,
+        percents:(offset / file.size) * 100,
+        msg:event.target.result
+      }})
+      if (offset < file.size) readSlice(offset)
+    })
     readSlice(0)
   }
   async _showMedia(){

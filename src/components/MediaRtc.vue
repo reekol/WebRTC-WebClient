@@ -95,7 +95,7 @@
           <md-file  id="inputDataFileLocal" multiple="multiple" placeholder="File to share" />
         </md-field>
         <md-progress-bar
-        v-show="['sendrecv','recvonly'].includes(file)"
+        v-show="['sendonly','sendrecv','recvonly'].includes(file)"
         class="md-accent" md-mode="buffer" :md-value="bytesAmount" :md-buffer="bytesBuffer"></md-progress-bar>
       </md-card-content>
       <div style="clear:both"></div>
@@ -233,28 +233,29 @@ export default {
 //           navigator.vibrate([300, 300, 300]) // 3 short buzzes indicating a task is completed
           if(navigator.vibrate) navigator.vibrate(1000)
         }
-        let displayMsg        = async (m  )            => { this.textRemote += m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
-        let sendMessage       = async (rtc,m)          => { displayMsg('⇨ ' + m); rtc.dataSend(m); this.textLocal='' }
-        let onFileChange      = async (rtc)            => { let file = inputDataFileLocal.files[0]; if (file) rtc.sendFile(file) }
-        let getChunk          = async (data)           => { this.bytesAmount   = data.percents }
-        let fileReady         = async (data)           => {
+        let displayMsg        = async (m    )    => { this.textRemote += m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
+        let sendMessage       = async (rtc,m)    => { displayMsg('⇨ ' + m); rtc.dataSend(m); this.textLocal='' }
+        let onFileChange      = async (rtc  )    => { let file = inputDataFileLocal.files[0]; if (file) rtc.sendFile(file) }
+        let getChunk          = async (data )    => { this.bytesAmount   = data.percents }
+        let progress          = async (data )    => { this.bytesAmount    = data.percents }
+        let fileReady         = async (data )    => {
             this.bytesAmount    = data.percents
             downloadAnchor.href = URL.createObjectURL(new Blob(data.chunks))
             downloadAnchor.download = data.name
-            downloadAnchor.textContent = `> '${data.name}' (${data.size} bytes)`;
+            downloadAnchor.textContent = `Download: ${data.name} (${data.size} bytes)`;
         }
-
         let onUpdate          = async (rtc,updateData) => {
-          if(this.connectionStatus !== updateData.connectionState) beep(20, 6000, 100)
+          if(this.connectionStatus  !== updateData.connectionState) beep(20, 6000, 100)
           this.connectionStatus       = updateData.connectionState
           this.userIdLocal            = updateData.userIdLocal  || ''
           this.userIdRemote           = updateData.userIdRemote || window.location.hash.substr(1) || ''
           this.srcObjectLocal         = updateData.streamLocal
           this.srcObjectRemote        = updateData.streamRemote
           this.fullPath               = this.$root.$data.path + this.$router.currentRoute.path.replace('streamer','client') + '#' + this.userIdLocal
-          if(updateData.message === rtc.MSG_DATA_RECEIVED)  displayMsg('⇦ ' + updateData.dataReceived)
-          if(updateData.message === rtc.MSG_CHUNK_RECEIVED) getChunk (updateData.dataReceived)
-          if(updateData.message === rtc.MSG_FILE_READY)     fileReady(updateData.dataReceived)
+          if(updateData.message === rtc.MSG_DATA_RECEIVED)    displayMsg('⇦ ' + updateData.dataReceived)
+          if(updateData.message === rtc.MSG_CHUNK_RECEIVED)   getChunk (updateData.dataReceived)
+          if(updateData.message === rtc.MSG_FILE_READY)       fileReady(updateData.dataReceived)
+          if(updateData.message === rtc.MSG_SOCKET_DATA_SENT) progress (updateData.dataReceived)
         }
         
        loadJs(document, 'script', 'media-socket',this.$root.$data.client, async () => {
