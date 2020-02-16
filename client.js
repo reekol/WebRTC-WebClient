@@ -14,14 +14,19 @@ class NkRtcClass {
     this.MSG_CONNECTION_STATE   = 'Connection state changed'
     this.MSG_USER_REMOTE_CONN   = "Remote user connected"
     this.MSG_DATA_RECEIVED      = "Data received"
-
+    this.MSG_CHUNK_RECEIVED     = "Data chunk deceived"
+    this.MSG_FILE_READY         = "File ready to download"
+    
+    this._lastFileConst         = {size:0,lastChunkNumber:0, lastChunkSize:0, chunks:[], receivedTotal:0,percents:0}
+    this._lastFile              = this._lastFileConst
     this._socketAddr            = options.socketAddr
     this._audioDirection        = options.audioDirection
     this._videoDirection        = options.videoDirection
     this._dataDirection         = options.dataDirection
-    this._fileDiretion          = options.fileDiretion
+    this._fileDirection         = options.fileDirection
     this._stunServers           = options.stunServers
     this._onUpdate              = options.onUpdate ||  (() => { })
+    this._chunkSize             = options.chunkSize || 56384
     this._streamLocal           = null
     this._streamRemote          = null    
     this._userIdLocal           = null
@@ -67,7 +72,8 @@ class NkRtcClass {
     this._connection.onicecandidate               = this._onIceCandidate.bind(this)
     this._connection.onconnectionstatechange      = this._onStateChanged.bind(this)
     this._connection.oniceconnectionstatechange   = this._onStateChanged.bind(this)
-    if(['sendrecv','sendonly'].includes(this._dataDirection)) this._addDataChannel()
+    if(['sendrecv','sendonly','recvonly'].includes(this._dataDirection)) this._addDataChannel()
+    if(['sendrecv','sendonly','recvonly'].includes(this._fileDirection)) this._addDataChannel()
   }
 //  _____                             _   _                         _ _ _                _        
 // /  __ \                           | | (_)                       | | | |              | |       
@@ -130,6 +136,11 @@ class NkRtcClass {
     this._connection.addIceCandidate(new RTCIceCandidate(data.candidate)) 
   }
   async dataSend    (msg  ){ 
+    d(['data send',msg])
+    this._connection.dataChannel.send(msg) 
+  }
+  dataSendSync      (msg  ){ 
+    d(['data send',msg])
     this._connection.dataChannel.send(msg) 
   }
   async _rtcConnectionState(){ 
@@ -195,13 +206,49 @@ class NkRtcClass {
     }
     this._addTransceevers()
   }
+  _dataDetection(data){
+    let meta = null;
+    try{ meta = JSON.parse(data)
+    }catch(e){ }
+    if(meta){
+      this._lastFile = this._lastFileConst
+      this._lastFile.size = meta.size
+      this._lastFile.name = meta.name
+    }else{
+      if(typeof data === 'object'){
+        this._lastFile.lastChunkNumber++
+        this._lastFile.lastChunkSize = data.byteLength
+        this._lastFile.receivedTotal += data.byteLength
+        this._lastFile.percents = (this._lastFile.receivedTotal / this._lastFile.size) * 100
+        this._lastFile.chunks.push(data)
+          this._update({message:(this._lastFile.percents < 100 ? this.MSG_CHUNK_RECEIVED :this.MSG_FILE_READY),data:this._lastFile})
+      }else{
+        this._update({message:this.MSG_DATA_RECEIVED,data:data})
+      }
+    }
+  }
   async _addDataChannel(){
     this._connection.dataChannel           = this._connection.createDataChannel({ ordered: false, maxPacketLifeTime: 3000, })
     this._connection.dataChannel.onerror   = this.error
     this._connection.dataChannel.onmessage = event => { d("Got Data Channel Message:", event.data) }
     this._connection.dataChannel.onclose   = ()    => { d("The Data Channel is Closed") }
     this._connection.dataChannel.onopen    = ()    => { d("--- DC connected ---") }
-    this._connection.ondatachannel         = (event) =>{ event.channel.onmessage = (e) => { this._update({message:this.MSG_DATA_RECEIVED,data:e.data}) } }
+    this._connection.ondatachannel         = (event) =>{ event.channel.onmessage = (e) => { this._dataDetection(e.data) } }
+  }
+  async sendFile(file) {
+    if (file.size === 0) return // Handle 0 size files.
+    await this.dataSend(JSON.stringify({
+      name:file.name,
+      size:file.size,
+      type:file.type
+    }))
+    let fileReader = new FileReader()
+    let offset = 0
+    let readSlice = o => { fileReader.readAsArrayBuffer(file.slice(offset, o + this._chunkSize)) }
+    fileReader.addEventListener('error', error => console.error('Error reading file:', error))
+    fileReader.addEventListener('abort', event => console.log('File reading aborted:', event))
+    fileReader.addEventListener('load' , event => { this.dataSendSync(event.target.result); offset += event.target.result.byteLength; if (offset < file.size) readSlice(offset) })
+    readSlice(0)
   }
   async _showMedia(){
     let optionsAudio = [{text:'No audio',value:''}]

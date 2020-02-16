@@ -90,26 +90,30 @@
         </md-field>
         <!-- File local --->
         <md-field 
-        v-show="['sedrecv','sendonly'].includes(file)"
-        class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
+        v-show="['sendrecv','sendonly'].includes(file)"
+          class="md-layout-item md-xlarge-size-100 md-large-size-100 md-medium-size-100">
           <md-file  id="inputDataFileLocal" multiple="multiple" placeholder="File to share" />
         </md-field>
+        <md-progress-bar
+        v-show="['sendrecv','recvonly'].includes(file)"
+        class="md-accent" md-mode="buffer" :md-value="bytesAmount" :md-buffer="bytesBuffer"></md-progress-bar>
       </md-card-content>
       <div style="clear:both"></div>
       <md-card-actions>
         <div style="clear:both"></div>
         <md-button
-        v-show="showBtnDownload"
-        id="btnDl"      class="md-layout-item md-xlarge-size-20"><a href="#" id="downloadAnchor" >Download</a></md-button>
+        v-show="['sendrecv','recvonly'].includes(file) && bytesAmount == 100"
+        id="btnDl"      class="md-layout-item md-xlarge-size-100"><a href="#" id="downloadAnchor" >Download</a></md-button>
         <md-button 
         v-show="userIdLocal
-          && ( ( options.videoSelected || options.audioSelected ) || ['sendonly','sendrecv'].includes(file) )
+          && ( ( options.videoSelected || options.audioSelected ) )
           "
         id="btnStream"  class="md-layout-item md-xlarge-size-20">Stream</md-button>
         <md-button 
         v-show="
-        ( ['recvonly','sendrecv'].includes(video) || ['recvonly','sendrecv'].includes(audio) || data !== 'inactive' || ['recvonly','sendrecv'].includes(file)  )
-        && userIdRemote"
+        ( ['recvonly','sendrecv'].includes(video) || ['recvonly','sendrecv'].includes(audio) || data !== 'inactive' || file !== 'inactive'  )
+        && userIdRemote
+        && connectionStatus !== 'connected'"
         id="btnCall"    class="md-layout-item md-xlarge-size-20">Dial</md-button>
         <md-button 
         v-show="userIdRemote && data !== 'inactive' && textLocal"
@@ -154,6 +158,8 @@ export default {
         optionsAudio:[],
         optionsVideo:[]
       },
+      bytesAmount:0,
+      bytesBuffer:0,
       beepConnection:true,
       showShare:true,
       fullPath:null,
@@ -162,7 +168,7 @@ export default {
       userIdRemote:'',
       connections:[],
       fullscreen:false,
-      connectionStatus:'',
+      connectionStatus:'new',
       dataFileLocal:null,
       textLocal:'',
       textRemote:'',
@@ -203,6 +209,13 @@ export default {
           fjs.parentNode.insertBefore(js, fjs)
         }
         
+        this.userIdRemote     = window.location.hash.substr(1) || ''
+        
+        let downloadAnchor    = document.querySelector('#downloadAnchor')
+        let inputTextRemote   = document.querySelector('#inputTextRemote')
+        let inputDataFileLocal= document.querySelector('#inputDataFileLocal')
+            inputVideoLocal.volume= 0
+
         let audioContext =new AudioContext() // browsers limit the number of concurrent audio contexts, so you better re-use'em
         let beep = (vol, freq, duration) => {
           let v=audioContext.createOscillator()
@@ -218,15 +231,18 @@ export default {
 //           navigator.vibrate(200)  // a short buzz indicating the action went fine
 //           navigator.vibrate(2000) //, a long buzz indicating there was some sort of error
 //           navigator.vibrate([300, 300, 300]) // 3 short buzzes indicating a task is completed
-          navigator.vibrate(1000)
+          if(navigator.vibrate) navigator.vibrate(1000)
         }
-
-        this.userIdRemote     = window.location.hash || ''
-        let inputTextRemote   = document.querySelector('#inputTextRemote')
-        
         let displayMsg        = async (m  )            => { this.textRemote += m + '\n'; inputTextRemote.scrollTop = inputTextRemote.scrollHeight; }
         let sendMessage       = async (rtc,m)          => { displayMsg('⇨ ' + m); rtc.dataSend(m); this.textLocal='' }
-        inputVideoLocal.volume= 0
+        let onFileChange      = async (rtc)            => { let file = inputDataFileLocal.files[0]; if (file) rtc.sendFile(file) }
+        let getChunk          = async (data)           => { this.bytesAmount   = data.percents }
+        let fileReady         = async (data)           => {
+            this.bytesAmount    = data.percents
+            downloadAnchor.href = URL.createObjectURL(new Blob(data.chunks))
+            downloadAnchor.download = data.name
+            downloadAnchor.textContent = `> '${data.name}' (${data.size} bytes)`;
+        }
 
         let onUpdate          = async (rtc,updateData) => {
           if(this.connectionStatus !== updateData.connectionState) beep(20, 6000, 100)
@@ -236,10 +252,12 @@ export default {
           this.srcObjectLocal         = updateData.streamLocal
           this.srcObjectRemote        = updateData.streamRemote
           this.fullPath               = this.$root.$data.path + this.$router.currentRoute.path.replace('streamer','client') + '#' + this.userIdLocal
-          if(updateData.message === rtc.MSG_DATA_RECEIVED) displayMsg('⇦ ' + updateData.dataReceived)
+          if(updateData.message === rtc.MSG_DATA_RECEIVED)  displayMsg('⇦ ' + updateData.dataReceived)
+          if(updateData.message === rtc.MSG_CHUNK_RECEIVED) getChunk (updateData.dataReceived)
+          if(updateData.message === rtc.MSG_FILE_READY)     fileReady(updateData.dataReceived)
         }
         
-        loadJs(document, 'script', 'media-socket',this.$root.$data.client, async () => {
+       loadJs(document, 'script', 'media-socket',this.$root.$data.client, async () => {
           this.$root.$data.rtc = new NkRtcClass({
             socketAddr:     this.$root.$data.socket,
             audioDirection: this.audio,
@@ -258,6 +276,8 @@ export default {
           document.querySelector('#btnCall')        .addEventListener('click',  () => { rtc.dial(this.userIdRemote) })
           document.querySelector('#btnSend')        .addEventListener('click',  () => { sendMessage(rtc,this.textLocal) })
           document.querySelector('#inputTextLocal') .addEventListener('keypress',e => { (e.key === 'Enter' ? sendMessage(rtc,this.textLocal) : false ) })
+          inputDataFileLocal.addEventListener('change', () => { onFileChange(rtc) })
+
         })
       })()
   /* eslint-enable */

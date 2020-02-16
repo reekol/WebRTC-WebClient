@@ -64,17 +64,6 @@
           btn1="Chat"
         />
         
-        <card-offer 
-          linkhead="/cam/stack/all"
-          image="star"
-          title="All in one."
-          subhead="Free for non-commercial use."
-          content1="Two-way audio."
-          content2="Two-way video."
-          content3="Two-way data"
-          link1="/stack/all" 
-          btn1="Go go!"
-        />
 <!--
         <card-offer 
           linkhead="/cam/data/call"
@@ -103,7 +92,7 @@
           btn1="Share"
           btn2="Download"
         />
-        <!--
+<!--
         <card-offer 
           linkhead="/register"
           image="user-circle"
@@ -116,6 +105,18 @@
           btn1="Register"
         />
 -->
+        <card-offer 
+          linkhead="/cam/stack/all"
+          image="star"
+          title="All in one."
+          subhead="Free for non-commercial use."
+          content1="Two-way audio."
+          content2="Two-way video."
+          content3="Two-way data"
+          link1="/stack/all" 
+          btn1="Go go!"
+        />
+
     </div>
 </template>
 

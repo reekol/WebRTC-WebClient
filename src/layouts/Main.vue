@@ -5,7 +5,6 @@
         <ul>
             <router-link tag="li" to="/">Home</router-link>
             <router-link tag="li" to="/about">About</router-link>
-            <li style="padding-left:100px"><font-awesome-icon icon="terminal" /> ReeKol</li>
         </ul>
     </div>
     <div class="centered-container">
