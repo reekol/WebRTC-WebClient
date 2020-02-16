@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "deploy":"scp -rp dist root@seqr.link:/var/www/html/winterborn.org/dist && scp client.js root@seqr.link:/var/www/html/winterborn.org/client.js",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
